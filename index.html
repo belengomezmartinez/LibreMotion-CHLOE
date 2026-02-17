@@ -10,7 +10,7 @@
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #1a1a1a; /* Modo oscuro por defecto */
+            background-color: #1a1a1a; /* Dark Mode by default */
             overflow: hidden;
             color: white;
             transition: background-color 0.3s ease, color 0.3s ease;
@@ -25,11 +25,11 @@
             display: block;
         }
 
-        /* --- Selector de Tema --- */
+        /* --- Theme --- */
         .theme-toggle {
             position: absolute;
             bottom: 20px;
-            right: 20px; /* Ajustar según espacio disponible */
+            right: 20px; 
             z-index: 100;
             display: flex;
             gap: 4px;
@@ -74,7 +74,7 @@
             font-size: 0.9em;
         }
 
-        /* --- Estilos Selector de Idioma (NUEVO) --- */
+        /* --- Language --- */
         .language-selector {
             position: absolute;
             bottom: 80px;
@@ -112,7 +112,7 @@
             border-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* Contenedor para los controles de subida */
+        /* Uploader */
         #uploader-container {
             position: absolute;
             top: 20px;
@@ -178,7 +178,7 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Controles de reproducción mejorados */
+        /* Controller */
         #controls-container {
             position: absolute;
             bottom: 20px;
@@ -261,7 +261,6 @@
             font-weight: 500;
         }
 
-        /* Controles de frame por frame */
         .frame-controls {
             display: flex;
             gap: 4px;
@@ -291,7 +290,7 @@
             background: rgba(255, 255, 255, 0.1);
         }
 
-        /* Panel de marcadores */
+        /* Marker panel */
         #markers-panel {
             position: absolute;
             top: 80px;
@@ -516,21 +515,19 @@
             transform: translateY(-1px);
         }
 
-        /* Ajuste Responsive */
         @media (max-width: 768px) {
             .view-toggle {
-                top: 60px; /* Bajarlo en móviles */
+                top: 60px; 
                 left: 20px;
                 width: calc(100vw - 40px);
             }
             
-            /* Mover los otros paneles más abajo si es necesario en móvil */
             #markers-panel, #trajectories-panel, #analog-panel {
-                top: 100px; /* Ajuste para dar espacio al nuevo botón */
+                top: 100px; 
             }
         }
 
-        /* Modo claro - Botón de vista */
+        /* Light Mode */
         body.light-mode .view-toggle {
             background: rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0, 0, 0, 0.2);
@@ -542,7 +539,6 @@
             border-color: rgba(0, 0, 0, 0.3);
         }
 
-        /* --- Botones de tema - ajustes para modo claro --- */
         body.light-mode .theme-btn {
             background: rgba(0, 0, 0, 0.05);
             color: #666;
@@ -560,7 +556,6 @@
             border-color: rgba(0, 0, 0, 0.1);
         }
 
-        /* --- Botones de idioma - ajustes para modo claro --- */
         body.light-mode .lang-btn {
             background: rgba(0, 0, 0, 0.05);
             color: #666;
@@ -578,14 +573,12 @@
             border-color: rgba(0, 0, 0, 0.1);
         }
 
-        /* --- Selector de idioma y tema - ajustes contenedor modo claro --- */
         body.light-mode .language-selector,
         body.light-mode .theme-toggle {
             background: rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0, 0, 0, 0.15);
         }
 
-        /* --- Botones de panel - ajustes para modo claro --- */
         body.light-mode .panel-toggle,
         body.light-mode .trajectories-toggle,
         body.light-mode .analog-toggle,
@@ -603,27 +596,25 @@
             border-color: rgba(0, 0, 0, 0.3);
         }
 
-        /* Botones especiales con colores en modo claro */
         body.light-mode .analog-toggle {
-            color: #0c7075; /* Cyan más oscuro */
+            color: #0c7075; 
         }
 
         body.light-mode .trajectories-toggle {
-            color: #d48806; /* Amarillo más oscuro */
+            color: #d48806; 
         }
 
-        /* --- Mejoras de legibilidad para modo claro --- */
         body.light-mode .marker-name {
-            color: #333; /* Texto más oscuro para mejor contraste */
+            color: #333;
             font-weight: 500;
         }
 
         body.light-mode .non-standard-badge {
-            color: #cc0000; /* Rojo más intenso para modo claro */
+            color: #cc0000; 
         }
 
         body.light-mode .category-header h4 {
-            color: #007bff; /* Azul más definido */
+            color: #007bff; 
         }
 
         body.light-mode .category-count {
@@ -646,7 +637,7 @@
         body.light-mode .marker-trajectory-btn {
             background: rgba(0, 0, 0, 0.1);
             border: 1px solid rgba(0, 0, 0, 0.2);
-            color: #d48806; /* Amarillo/marrón para mejor contraste */
+            color: #d48806;
         }
 
         body.light-mode .marker-trajectory-btn:hover {
@@ -660,7 +651,6 @@
             color: #b37400;
         }
 
-        /* --- Panel de trayectorias en modo claro --- */
         body.light-mode #trajectories-panel,
         body.light-mode #markers-panel {
             background: rgba(255, 255, 255, 0.95);
@@ -709,7 +699,7 @@
         body.light-mode .clear-trajectories:hover {
             background: rgba(220, 53, 69, 0.2);
         }
-        /* --- Panel de Datos Analógicos - Modo Claro --- */
+       
         body.light-mode #analog-panel {
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(0, 0, 0, 0.2);
@@ -726,7 +716,7 @@
         }
 
         body.light-mode .channel-name {
-            color: #0c7075; /* Cyan más oscuro para mejor contraste */
+            color: #0c7075; 
             font-weight: 600;
         }
 
@@ -806,7 +796,6 @@
             font-weight: 700;
         }
 
-        /* --- Colores específicos por tipo de datos analógicos --- */
         body.light-mode .analog-channel[data-channel-type="desconocido"] {
             border-left-color: #6c757d;
         }
@@ -870,8 +859,6 @@
             color: #b37400 !important;
         }
 
-
-        /* --- Panel de Metadatos - Modo Claro --- */
         body.light-mode #metadata-panel {
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(0, 0, 0, 0.2);
@@ -908,7 +895,6 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        /* --- Mejora general para textos en modo claro --- */
         body.light-mode {
             color: #333;
         }
@@ -943,7 +929,6 @@
             font-weight: 600;
         }
 
-        /* --- Mejora para los paneles flotantes en general --- */
         body.light-mode .panel-toggle,
         body.light-mode .analog-toggle,
         body.light-mode .metadata-toggle,
@@ -964,7 +949,6 @@
             border-color: rgba(0, 0, 0, 0.3);
         }
 
-        /* Específicos para cada botón con su color característico */
         body.light-mode .analog-toggle {
             color: #0c7075;
         }
@@ -976,7 +960,7 @@
         body.light-mode .view-toggle {
             color: #6f42c1;
         }
-        /* --- Slider en modo claro --- */
+        
         body.light-mode input[type="range"] {
             background: rgba(0, 0, 0, 0.05);
         }
@@ -995,7 +979,7 @@
             color: #222;
             font-weight: 600;
         }
-        /* --- Uploader Container - Modo Claro --- */
+        
         body.light-mode #uploader-container {
             background: rgba(255, 255, 255, 0.95);
             border: 1px solid rgba(0, 0, 0, 0.2);
@@ -1032,9 +1016,8 @@
             color: #17a2b8;
         }
 
-        
 
-        /* Panel de trayectorias */
+        /* Trajectory panel */
         #trajectories-panel {
             position: absolute;
             top: 80px;
@@ -1147,7 +1130,7 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Panel de metadatos */
+        /* Metadata panel */
         #metadata-panel {
             position: absolute;
             top: 80px;
@@ -1230,7 +1213,7 @@
             backdrop-filter: blur(10px);
         }
 
-        /* Panel de datos analógicos */
+        /* Analog panel */
         #analog-panel {
             position: absolute;
             top: 80px;
@@ -1327,7 +1310,6 @@
             backdrop-filter: blur(10px);
         }
 
-        /* NUEVO: Estilos para clasificación de datos analógicos */
         .analog-type-badge {
             display: inline-block;
             padding: 2px 8px;
@@ -1421,7 +1403,7 @@
             font-weight: 600;
         }
 
-        /* Ajustes responsive */
+    
         @media (max-width: 1200px) {
             #metadata-panel {
                 width: 250px;
@@ -1535,7 +1517,7 @@
         }
 
 
-        /* Contenedor principal que se ajusta cuando se abre el panel derecho */
+        /* Main wrapper, that adjusts itself when the right panel is open */
         .main-wrapper {
             display: flex;
             width: 100vw;
@@ -1545,27 +1527,25 @@
             align-items: center;
         }
 
-        /* Cuando se abre el panel derecho, el izquierdo se reduce */
         .main-wrapper.with-plots #left-panel {
             width: 50%;
             flex-shrink: 0;
         }
 
+        /* Plots panel */
         .main-wrapper.with-plots #right-panel {
             display: flex !important;
             width: 50%;
 
-            /* Ajustes de tamaño vertical */
             height: 65vh; 
-            margin-top: 150px;           /* Espacio en la parte superior */
-            margin-bottom: 175px;        /* Espacio en la parte inferior */
-            margin-right: 20px;         /* Separación opcional del borde derecho */
+            margin-top: 150px;           
+            margin-bottom: 175px;        
+            margin-right: 20px;         
             
-            /* Estética de panel flotante */
-            border-radius: 15px;        /* Redondea las esquinas */
-            border: 1px solid var(--border-color); /* Asegura que el borde se vea en todo el contorno */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); /* Sombra para dar profundidad */
-            overflow: hidden;           /* Evita que el contenido se salga de las esquinas redondeadas */
+            border-radius: 15px;        
+            border: 1px solid var(--border-color); 
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); 
+            overflow: hidden;          
         }
 
         .main-wrapper:not(.with-plots) #right-panel {
@@ -1578,7 +1558,6 @@
             flex-shrink: 0 !important;
         }
 
-        /* Panel derecho (gráficas) - inicialmente oculto */
         .plots-panel {
             display: none;
             flex-direction: column;
@@ -1635,7 +1614,6 @@
             color: #ff6b6b;
         }
 
-        /* Contenido de gráficas */
         .plots-content {
             flex: 1;
             overflow-y: auto;
@@ -1645,7 +1623,6 @@
             gap: 20px;
         }
 
-        /* Selector de canales */
         .channel-selector-section {
             background: var(--card-bg);
             border-radius: 10px;
@@ -1713,7 +1690,6 @@
             flex: 1;
         }
 
-        /* Gráficas individuales */
         .plot-item {
             background: var(--card-bg);
             border-radius: 10px;
@@ -1743,7 +1719,6 @@
             width: 100%;
         }
 
-        /* Botón de gráficas en panel analógico */
         .plots-btn {
             width: 100%;
             background: linear-gradient(135deg, #007bff, #0056b3);
@@ -1764,7 +1739,6 @@
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
         }
 
-        /* Variables para temas */
         :root {
             --panel-bg: #1a1a1a;
             --header-bg: rgba(0, 0, 0, 0.9);
@@ -1789,7 +1763,7 @@
             --badge-bg: rgba(0, 0, 0, 0.1);
         }
 
-        /* Responsive */
+    
         @media (max-width: 1200px) {
             .main-wrapper.with-plots #left-panel {
                 width: 60%;
