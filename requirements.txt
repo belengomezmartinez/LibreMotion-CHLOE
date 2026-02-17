@@ -1,0 +1,4 @@
+ezc3d
+numpy
+flask
+gunicorn
