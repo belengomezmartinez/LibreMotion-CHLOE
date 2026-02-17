@@ -38,3 +38,12 @@ docker build -t chloe-visualizer .
 
 # Run the container
 docker run -p 8080:8080 chloe-visualizer
+```
+
+The application will be available at http://localhost:8080.
+
+### Author
+Belén Gómez Martínez – Biomedical Engineering, ETSIT, Universidad Politécnica de Madrid (UPM).
+
+### License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
