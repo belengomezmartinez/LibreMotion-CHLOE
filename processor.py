@@ -10,9 +10,8 @@ import ezc3d
 import math
 import numpy as np
 
-
 # ======================================================================
-# 1. STANDARDIZATION MAPS
+# STANDARDIZATION MAPS
 # ======================================================================
 
 # [Traceability: FR3 - Multi-Manufacturer C3D Support]
@@ -128,7 +127,7 @@ STANDARD_ANALOG_MAP = {
 }
 
 # ======================================================================
-# 2. BIOMECHANICAL PROCESSING UTILITIES
+# BIOMECHANICAL PROCESSING UTILITIES
 # ======================================================================
 
 def safe_float(val, default=0.0):
@@ -261,7 +260,7 @@ def extract_analog_data(c3d):
         return None
 
 # ======================================================================
-# 3. PROCESSING PIPELINE
+# PROCESSING PIPELINE
 # ======================================================================
 
 def process_c3d_file(c3d_file_path):

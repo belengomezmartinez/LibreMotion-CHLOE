@@ -14,7 +14,8 @@ import os
 
 load_dotenv() # Load environment variables from .env file 
 
-app = Flask(__name__, static_folder='dist')
+app = Flask(__name__, static_folder='dist', 
+            static_url_path='') # Serve static files from the 'dist' directory (built frontend)
 
 
 # ======================================================================
@@ -51,9 +52,6 @@ def handle_c3d_upload():
 
 @app.route('/')
 def serve_index(): return send_from_directory(app.static_folder, 'index.html')
-
-# @app.route('/<path:path>')
-# def serve_static(path): return send_from_directory(app.static_folder, path)
 
 if __name__ == '__main__':
     # NOTE: When running the full project (CHLOE), this block is ignored 
