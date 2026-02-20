@@ -28,9 +28,12 @@ RUN sed -i '/ezc3d/d' requirements.txt && \
     pip install --no-cache-dir -r requirements.txt
 
 COPY app.py .
+COPY processor.py .
 COPY --from=builder /app/dist ./dist/
 
 EXPOSE 8080
 
+ENV FLASK_PORT=8080
 # 4 workers for better concurrency, fulfilling the requirement NFR5 (Scalability)
-CMD ["gunicorn", "--bind", "0.0.0.0:8080", "--workers", "4", "app:app"] 
+ENV FLASK_WORKERS=4 
+CMD ["sh", "-c", "gunicorn --bind 0.0.0.0:$FLASK_PORT --workers $FLASK_WORKERS app:app"]
