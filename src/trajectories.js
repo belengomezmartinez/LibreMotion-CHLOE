@@ -103,7 +103,7 @@ function getActiveTrajectories() {
 /**
  * Updates the Trajectories sidebar list based on currently active 3D trajectories.
  */
-function updateTrajectoriesPanel() {
+export function updateTrajectoriesPanel() {
     if (!trajectoriesList) return;
     trajectoriesList.innerHTML = '';
     

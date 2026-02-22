@@ -10,10 +10,11 @@ import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { updateAvatarPose } from './kinematics.js';
-import { openPlotsPanel, updatePlotlyTimeLine, isPlotsOpen, closePlotsPanel, createPlots } from './plots.js';
+import { openPlotsPanel, updatePlotlyTimeLine, isAnalogPlotsOpen, closePlotsPanel, createAnalogPlots, updateVectorPlotLine } from './plots.js';
 import { TRANSLATIONS, t, updateToggleText, updateTextContent, updateTitle, updateThemeButtons, updatePlotsTranslations } from './i18n.js';
 import { MARKER_CATEGORIES, CONECTIONS, MARKERS_COLOURS, HAND_MARKERS_SET, HEAD_MARKERS, ANALOG_COLOURS} from './constants.js';
-import { toggleTrajectory, clearAllTrajectories, trajectories} from './trajectories.js';
+import { toggleTrajectory, clearAllTrajectories, trajectories, updateTrajectoriesPanel} from './trajectories.js';
+import { addMarkerVector, updateVectors3D, isVectorPanelOpen, setVectorPanelState, clearAllVectors, activeVectors} from './vectors.js';
 
 
 // ======================================================================================
@@ -41,6 +42,7 @@ export let avatarBones = {
 };
 export let avatarLoaded = false;
 export let isAvatarMode = true; // true = the avatar is shown, false = the lines are shown
+export let originalFPS = 0;
 
 let camera, renderer, controls, ambientLight;
 let markers = {}; 
@@ -49,7 +51,6 @@ let cabezaMarker;
 let frameIndex = 0;
 let isPlaying = false;
 let playbackSpeed = 1;
-let originalFPS = 0;
 let frameAccumulator = 0;
 let lastTime = 0;
 let currentFileName = '';
@@ -85,6 +86,8 @@ const clearTrajectoriesBtn = document.getElementById('clear-trajectories');
 const analogPanel = document.getElementById('analog-panel');
 const analogToggle = document.getElementById('analog-toggle');
 const analogContent = document.getElementById('analog-content');
+const vectorsToggle = document.getElementById('vectors-toggle');
+const vectorsPanel = document.getElementById('vectors-panel');
 
 
 // ============================================================================================================================================
@@ -107,6 +110,12 @@ function changeLanguage(lang) {
     updateTextContent('analog-title', t('analog.title'));
     updateTextContent('metadata-title', t('metadata.title'));
     updateTextContent('clear-trajectories', t('trajectories.clear_all'));
+    updateTextContent('vectors-title', t('vectors.title'));
+    updateTextContent('btn-add-vector', t('vectors.add'));
+    updateTextContent('btn-remove-vector', t('vectors.remove'));
+    updateTextContent('btn-select-start-marker', t('vectors.select_start'));
+    updateTextContent('btn-select-end-marker', t('vectors.select_end'));
+    updateTextContent('vectors-title', t('vectors.title'));
 
     // Update Control Tooltips
     updateTitle('btn-reset', t('controls.reset'));
@@ -119,12 +128,14 @@ function changeLanguage(lang) {
     updateTextContent('lbl-speed', t('controls.speed') + ':');
     updateTextContent('lbl-fps', t('controls.fps') + ':');
     updateTextContent('lbl-original', t('controls.original_rate') + ':');
+    
 
     // Update Toggle Buttons
     updateToggleText(panelToggle, 'ui.markers', markersPanel);
     updateToggleText(metadataToggle, 'ui.metadata', metadataPanel);
     updateToggleText(trajectoriesToggle, 'ui.trajectories', trajectoriesPanel);
     updateToggleText(analogToggle, 'ui.analog', analogPanel);
+    updateToggleText(vectorsToggle, 'ui.vectors', vectorsPanel);
 
     // Initial prompt if no file loaded
     if (!animationData) {
@@ -137,6 +148,7 @@ function changeLanguage(lang) {
         if (lastLoadedData) createMetadataPanel(lastLoadedData);
         if (lastLoadedData && lastLoadedData.analog_data) createAnalogPanel(lastLoadedData.analog_data);
         updateTrajectoriesPanel();
+        createVectorsPanel();
     }
     
     // Visual feedback on active language
@@ -154,10 +166,10 @@ function changeLanguage(lang) {
     }
 
     // Graphs title and labels if open
-    if (isPlotsOpen) {
+    if (isAnalogPlotsOpen) {
         updatePlotsTranslations();
         if (lastLoadedData?.analog_data) {
-            createPlots(lastLoadedData.analog_data); // Re-render plots 
+            createAnalogPlots(lastLoadedData.analog_data); // Re-render plots 
         }
     }
 
@@ -364,6 +376,8 @@ function setupSceneFromData(data) {
     if (data.analog_data) createAnalogPanel(data.analog_data);
     else if (analogContent) analogContent.innerHTML = `<div class="no-analog-data">${t('analog.no_data')}</div>`;
 
+    createVectorsPanel();
+
     // Playback Initialization
     isPlaying = true; 
     if (btnPlayPause) btnPlayPause.textContent = '⏸'; 
@@ -384,6 +398,7 @@ function clearScene() {
     Object.values(markers).forEach(marker => scene.remove(marker));
     lines.forEach(line => scene.remove(line));
     if (cabezaMarker) { scene.remove(cabezaMarker); cabezaMarker = null; }
+    clearAllVectors();
     clearAllTrajectories();
 
     // Avatar returns to T-pose and default position
@@ -721,6 +736,72 @@ function createAnalogPanel(analogData) {
 }
 
 /**
+ * Generates the Vectors Panel UI, allowing users to select pairs of markers to visualize their relative angles over time.
+ */
+function createVectorsPanel() {
+    const panel = document.getElementById('vectors-panel-content');
+    if (!panel) return;
+
+    if (!document.getElementById('vec-start')) {
+        const markerNames = Object.keys(markers);
+        panel.innerHTML = `
+            <div class="vector-selector-group">
+                <label>${t('vectors.select_start')}:</label>
+                <select id="vec-start" class="vector-select">
+                    ${markerNames.map(m => `<option value="${m}">${m}</option>`).join('')}
+                </select>
+                
+                <label>${t('vectors.select_end')}:</label>
+                <select id="vec-end" class="vector-select">
+                    ${markerNames.map(m => `<option value="${m}">${m}</option>`).join('')}
+                </select>
+                
+                <button id="btn-add-vector" class="primary-btn">${t('vectors.add')}</button>
+            </div>
+            <div id="vector-graphs-section"></div>
+        `;
+    
+        const btnAdd = document.getElementById('btn-add-vector');
+        if (btnAdd) {
+            btnAdd.onclick = () => { // Usar .onclick asegura que solo haya uno
+                const start = document.getElementById('vec-start').value;
+                const end = document.getElementById('vec-end').value;
+                if (start !== end) {
+                    addMarkerVector(start, end);
+                } else {
+                    alert("Selecciona marcadores diferentes");
+                }
+            };
+        }
+    } else {
+        const labels = panel.querySelectorAll('.vector-selector-group label');
+        if (labels.length >= 2) {
+            labels[0].textContent = `${t('vectors.select_start')}:`;
+            labels[1].textContent = `${t('vectors.select_end')}:`;
+        }
+        const btnAdd = document.getElementById('btn-add-vector');
+        if (btnAdd) btnAdd.textContent = t('vectors.add');
+
+        Object.keys(activeVectors).forEach(id => {
+            const graphDiv = document.getElementById(`plot-${id}`);
+            if (graphDiv && graphDiv.layout) {
+                Plotly.relayout(graphDiv, {
+                    'xaxis.title.text': t('vectors.axis_seconds'),
+                    'yaxis.title.text': t('vectors.axis_degrees')
+                });
+            }
+        });
+    }
+
+    const graphsSection = document.getElementById('vector-graphs-section');
+    if (graphsSection && graphsSection.innerHTML === '') {
+        Object.keys(activeVectors).forEach(id => {
+            import('./plots.js').then(m => m.createVectorPlots(id));
+        });
+    }
+}
+
+/**
  * Toggles the visibility of an entire biomechanical category (e.g., Pelvis, Torso).
  * Updates the internal state, the 3D meshes, and the UI checkboxes simultaneously.
  * @param {string} categoryId - The ID of the category defined in MARKER_CATEGORIES.
@@ -1053,7 +1134,7 @@ function enableLightMode() {
 
 
 // ============================================================================================================================================
-// ANIMATION AND KINEMATICS LOGIC
+// ANIMATION LOGIC
 // ============================================================================================================================================
 
 /**
@@ -1156,9 +1237,14 @@ function updateSceneToFrame(index) {
     }
     updateAvatarPose(frame);
 
+    updateVectors3D(frame);
+
     const currentTime = index / originalFPS;
-    if (isPlotsOpen) {
+    if (isAnalogPlotsOpen) {
         updatePlotlyTimeLine(currentTime);
+    }
+    if (isVectorPanelOpen) {
+        updateVectorPlotLine(currentTime);
     }
     
     frameIndex = index;
@@ -1167,7 +1253,6 @@ function updateSceneToFrame(index) {
     updateFrameButtons();
 
 }
-
 
 // ============================================================================================================================================
 // EVENT LISTENERS (Click, Drag&Drop...)
@@ -1178,14 +1263,12 @@ window.addEventListener('resize', () => {
         const leftPanel = document.getElementById('left-panel');
         if (!leftPanel) return;
 
-        // Medir el tamaño real del div contenedor
         const width = leftPanel.clientWidth;
         const height = leftPanel.clientHeight;
         
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
         
-        // Ajustar el renderizador al tamaño del div, no de la ventana
         renderer.setSize(width, height);
     }
 });
@@ -1233,39 +1316,50 @@ if (viewModeToggle) {
     });
 }
 
-const togglePanel = (btn, panel, key) => {
-    const isVisible = panel.style.display !== 'none';
-    // Cerrar otros
-    [markersPanel, trajectoriesPanel, analogPanel, metadataPanel].forEach(p => { if(p !== panel) p.style.display = 'none'; });
-    // Toggle actual
-    panel.style.display = isVisible ? 'none' : 'block';
-    
-    // Actualizar textos de TODOS los botones toggle
+const togglePanel = (panel) => {
+    const isVisible = window.getComputedStyle(panel).display === 'block';
+    [markersPanel, trajectoriesPanel, analogPanel, metadataPanel, vectorsPanel].forEach(p => { 
+        if(p) p.style.display = 'none'; 
+    });
+
+    if (!isVisible) {
+        panel.style.display = 'block';
+        if (panel === vectorsPanel) {
+            setVectorPanelState(true);
+            if (animationData) createVectorsPanel();
+        }
+    } else {
+        if (panel === vectorsPanel) setVectorPanelState(false);
+    }
+
     updateToggleText(panelToggle, 'ui.markers', markersPanel);
     updateToggleText(trajectoriesToggle, 'ui.trajectories', trajectoriesPanel);
     updateToggleText(analogToggle, 'ui.analog', analogPanel);
     updateToggleText(metadataToggle, 'ui.metadata', metadataPanel);
+    updateToggleText(vectorsToggle, 'ui.vectors', vectorsPanel);
 };
 
-if (panelToggle) panelToggle.addEventListener('click', () => togglePanel(panelToggle, markersPanel, 'ui.markers'));
-if (trajectoriesToggle) trajectoriesToggle.addEventListener('click', () => togglePanel(trajectoriesToggle, trajectoriesPanel, 'ui.trajectories'));
-if (analogToggle) analogToggle.addEventListener('click', () => togglePanel(analogToggle, analogPanel, 'ui.analog'));
-if (metadataToggle) metadataToggle.addEventListener('click', () => togglePanel(metadataToggle, metadataPanel, 'ui.metadata'));
+if (panelToggle) panelToggle.onclick = () => togglePanel(markersPanel);
+if (trajectoriesToggle) trajectoriesToggle.onclick = () => togglePanel(trajectoriesPanel);
+if (analogToggle) analogToggle.onclick = () => togglePanel(analogPanel);
+if (metadataToggle) metadataToggle.onclick = () => togglePanel(metadataPanel);
+if (vectorsToggle) vectorsToggle.onclick = () => togglePanel(vectorsPanel);
 
 if (clearTrajectoriesBtn) clearTrajectoriesBtn.addEventListener('click', clearAllTrajectories);
 
 document.addEventListener('click', (e) => {
-    // Cerrar paneles si click fuera
-    const isPanel = e.target.closest('#markers-panel, #trajectories-panel, #analog-panel, #metadata-panel');
-    const isBtn = e.target.closest('.panel-toggle, .trajectories-toggle, .analog-toggle, .metadata-toggle');
+    const isPanel = e.target.closest('#markers-panel, #trajectories-panel, #analog-panel, #metadata-panel, #vectors-panel');
+    const isBtn = e.target.closest('.panel-toggle, .trajectories-toggle, .analog-toggle, .metadata-toggle, .vectors-toggle');
     const isLang = e.target.closest('.language-selector');
     
     if (!isPanel && !isBtn && !isLang) {
-        [markersPanel, trajectoriesPanel, analogPanel, metadataPanel].forEach(p => { if(p) p.style.display = 'none'; });
+        [markersPanel, trajectoriesPanel, analogPanel, metadataPanel, vectorsPanel].forEach(p => { if(p) p.style.display = 'none'; });
         updateToggleText(panelToggle, 'ui.markers', markersPanel);
         updateToggleText(trajectoriesToggle, 'ui.trajectories', trajectoriesPanel);
         updateToggleText(analogToggle, 'ui.analog', analogPanel);
         updateToggleText(metadataToggle, 'ui.metadata', metadataPanel);
+        updateToggleText(vectorsToggle, 'ui.vectors', vectorsPanel);
+        setVectorPanelState(false);
     }
 });
 
@@ -1278,10 +1372,6 @@ document.addEventListener('drop', (e) => {
 });
 
 if (uploadInput) uploadInput.addEventListener('change', (e) => handleFileUpload(e.target.files[0]));
-
-// ============================================================================================================================================
-// ANALOG PLOTTING MODULE (Plotly.js)
-// ============================================================================================================================================
 
 window.openPlotsPanel = openPlotsPanel;
 window.closePlotsPanel = closePlotsPanel;

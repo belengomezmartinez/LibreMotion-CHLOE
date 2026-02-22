@@ -1,12 +1,13 @@
 import Plotly from 'plotly.js-dist-min';
 import { t, updatePlotsTranslations } from './i18n.js';
 import { lastLoadedData } from './main.js';
+import { activeVectors, isVectorPanelOpen } from './vectors.js';
 
 let plotsPanel = null;
 let selectedChannels = [];
 let plotlyGraphs = {};
 
-export let isPlotsOpen = false;
+export let isAnalogPlotsOpen = false;
 
 //==============================================================================
 // Helper functions (used internally by the plotting panel and animation loop)
@@ -45,7 +46,7 @@ function initializePlotsPanel() {
         const analogData = lastLoadedData?.analog_data;
         if (analogData) {
             updateSelectedChannels();
-            createPlots(analogData);
+            createAnalogPlots(analogData);
         }
     });
 }
@@ -83,7 +84,7 @@ function loadChannelsSelector(analogData) {
  * High-performance rendering is required for clinical data with high sample rates.
  * @param {Object} analogData - Dictionary containing channel arrays and sample rates.
  */
-export function createPlots(analogData) {
+export function createAnalogPlots(analogData) {
     if (!analogData || selectedChannels.length === 0) return;
     
     const fs = analogData.sample_rate_hz || 1000;
@@ -178,7 +179,7 @@ function clearPlots() {
 
 
 //==============================================================================
-// Public functions (exported for use in main.js and animation loop)
+// Public functions (ANAL0G PLOTS, called from main.js and animation loop)
 //==============================================================================
 
 /**
@@ -191,7 +192,7 @@ export function closePlotsPanel() {
     mainWrapper.classList.remove('with-plots');
     if (rightPanel) rightPanel.style.display = 'none';
     
-    isPlotsOpen = false;
+    isAnalogPlotsOpen = false;
     clearPlots();
     
     setTimeout(() => {
@@ -214,7 +215,7 @@ export function openPlotsPanel(analogData) {
     mainWrapper.classList.add('with-plots');
     if (rightPanel) rightPanel.style.display = 'flex'; 
     
-    isPlotsOpen = true;
+    isAnalogPlotsOpen = true;
     
     if (!plotsPanel) {
         initializePlotsPanel();
@@ -236,13 +237,102 @@ export function openPlotsPanel(analogData) {
  * @param {number} currentTime - The current playback time in seconds.
  */
 export function updatePlotlyTimeLine(currentTime) {
-    if (!isPlotsOpen || !plotlyGraphs || selectedChannels.length === 0) return;
+    if (!isAnalogPlotsOpen || !plotlyGraphs || selectedChannels.length === 0) return;
     
     selectedChannels.forEach(channel => {
         const graphDiv = plotlyGraphs[channel];
         
         if (graphDiv && graphDiv.layout) {
             // Efficiently update only the vertical line shape without re-rendering the whole plot
+            Plotly.relayout(graphDiv, {
+                'shapes[0].x0': currentTime,
+                'shapes[0].x1': currentTime
+            });
+        }
+    });
+}
+
+//==============================================================================
+// Public functions (VECTOR PLOTS)
+//==============================================================================
+
+/**
+ * Placeholder function for creating angle plots for vectors defined by marker pairs.
+ * This will be called after calculating angles in vectors.js
+ * @param {string} id - Unique identifier for the vector (e.g., "RSHO-RUPA").
+ */
+export function createVectorPlots(id) {
+    const vec = activeVectors[id];
+    const container = document.getElementById('vector-graphs-section');
+    if (!vec || !container) return;
+
+    const isLightMode = document.body.classList.contains('light-mode');
+    const textColor = isLightMode ? '#333' : '#fff';
+
+    const div = document.createElement('div');
+    div.id = `wrapper-${id}`;
+    div.className = 'vector-plot-item';
+    div.innerHTML = `
+        <div class="vector-plot-header" style="display: flex; justify-content: space-between; align-items: center; padding: 5px 10px;">
+            <h5 style="margin:0;">Vector: ${vec.nameA} → ${vec.nameB}</h5>
+            <button class="remove-vector-btn" data-id="${id}" title="${t('vectors.remove')}" 
+                    style="background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer; padding: 2px 8px;">
+                ✕
+            </button>
+        </div>
+        <div id="plot-${id}"></div>
+    `;
+    container.appendChild(div);
+
+    div.querySelector('.remove-vector-btn').addEventListener('click', (e) => {
+        const vectorId = e.target.getAttribute('data-id');
+        import('./vectors.js').then(m => m.removeVector(vectorId));
+    });
+
+    const traces = [
+        { x: vec.angleData.time, y: vec.angleData.x, name: 'Ang X', line: {color: 'red'} },
+        { x: vec.angleData.time, y: vec.angleData.y, name: 'Ang Y', line: {color: 'green'} },
+        { x: vec.angleData.time, y: vec.angleData.z, name: 'Ang Z', line: {color: 'blue'} }
+    ];
+
+    const layout = {
+        height: 300,
+        margin: { t: 30, b: 50, l: 60, r: 20 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'rgba(0,0,0,0.1)',
+        font: { color: textColor },
+        xaxis: { 
+            title: { text: t('vectors.axis_seconds'), standoff: 15 },
+            automargin: true,
+            gridcolor: isLightMode ? '#ddd' : '#444'
+        },
+        yaxis: { 
+            title: { text: t('vectors.axis_degrees'), standoff: 15 },
+            range: [0, 180],
+            gridcolor: isLightMode ? '#ddd' : '#444'
+        },
+        showlegend: true,
+        legend: { orientation: "h", y: 1.1 },
+        shapes: [{ 
+            type: 'line', x0: 0, x1: 0, y0: 0, y1: 1, xref: 'x', yref: 'paper', 
+            line: { color: 'red', dash: 'dash' } 
+        }]  
+    };
+
+    Plotly.newPlot(`plot-${id}`, traces, layout);
+
+}
+
+/**
+ * Updates the vertical time line on all vector angle plots to synchronize with the 3D animation.
+ * This should be called on every frame of the animation loop.
+ * @param {number} currentTime - The current playback time in seconds.
+ */
+export function updateVectorPlotLine(currentTime) {
+    if (!isVectorPanelOpen || Object.keys(activeVectors).length === 0) return;
+    Object.keys(activeVectors).forEach(id => {
+        const graphDiv = document.getElementById(`plot-${id}`);
+        if (graphDiv && graphDiv.layout) {
             Plotly.relayout(graphDiv, {
                 'shapes[0].x0': currentTime,
                 'shapes[0].x1': currentTime

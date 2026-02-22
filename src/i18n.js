@@ -96,7 +96,8 @@ export const TRANSLATIONS = {
             analog: "📊 Datos Analógicos",
             metadata: "📈 Metadatos", 
             view_avatar: "👤 Ver Avatar",
-            view_lines: "🕸 Ver Esqueleto"
+            view_lines: "🕸 Ver Esqueleto", 
+            vectors: "📏 Vectores"
         },
         plots: {
             title: "Gráficas Analógicas",
@@ -110,6 +111,15 @@ export const TRANSLATIONS = {
             light: "Modo Claro",
             dark_icon: "🌙",
             light_icon: "☀️"
+        }, 
+        vectors: {
+            title: "Vectores",
+            add: "Crear Vector",
+            remove: "Eliminar Vector",
+            select_start: "Seleccionar marcador de inicio",
+            select_end: "Seleccionar marcador de fin",
+            axis_seconds: "Segundos",
+            axis_degrees: "Grados (°)"
         }
     },
     en: {
@@ -206,7 +216,8 @@ export const TRANSLATIONS = {
             analog: "📊 Analog Data",
             metadata: "📈 Metadata",
             view_avatar: "👤 View Avatar",
-            view_lines: "🕸 View Rig"
+            view_lines: "🕸 View Rig",
+            vectors: "📏 Vectors"
         },
         plots: {
             title: "Analog Plots",
@@ -220,7 +231,16 @@ export const TRANSLATIONS = {
             light: "Light Mode",
             dark_icon: "🌙",
             light_icon: "☀️"
-        }
+        },
+        vectors: {
+            title: "Vectors",
+            add: "Create Vector",
+            remove: "Remove Vector",
+            select_start: "Select start marker",
+            select_end: "Select end marker",
+            axis_seconds: "Seconds",
+            axis_degrees: "Degrees (°)"
+        }   
     },
     fr: {
         app: {
@@ -313,10 +333,11 @@ export const TRANSLATIONS = {
             markers: "📋 Marqueurs",
             close: "✕ Fermer",
             trajectories: "🔄 Trajectoires",
-            analog: "📊 Données Analog.",
+            analog: "📊 Données Analog",
             metadata: "📈 Métadonnées",
             view_avatar: "👤 Voir Avatar",
-            view_lines: "🕸 Voir le squelette"
+            view_lines: "🕸 Voir le squelette",
+            vectors: "📏 Vecteurs"
         },
         plots: {
             title: "Graphiques Analogiques",
@@ -330,6 +351,15 @@ export const TRANSLATIONS = {
             light: "Mode Clair",
             dark_icon: "🌙",
             light_icon: "☀️"
+        }, 
+        vectors: {
+            title: "Vecteurs",
+            add: "Créer un Vecteur",
+            remove: "Supprimer le Vecteur",
+            select_start: "Sélectionner le marqueur de départ",
+            select_end: "Sélectionner le marqueur de fin",
+            axis_seconds: "Secondes",
+            axis_degrees: "Degrés (°)"  
         }
     }
 };
