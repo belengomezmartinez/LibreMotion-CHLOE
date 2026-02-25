@@ -2,7 +2,7 @@
 PROJECT: CHLOE - Clinical Helper for Locomotion Objective Evaluation
 AUTHOR: Belén Gómez Martínez
 THESIS: Bachelor's Thesis (TFG) - [Grado en Ingeniería Biomédica, ETSIT, UPM]
-DESCRIPTION: Backend engine for C3D parsing and biomechanical data standardization
+DESCRIPTION: Flask-based REST API orchestrating C3D file ingestion, temporal storage, and synchronization between biomechanical processing and the web interface.
 REFERENCES: Chapter 3 (Requirements), Chapter 4 (Design & Implementation)
 """
 

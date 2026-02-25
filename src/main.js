@@ -1255,7 +1255,7 @@ function updateSceneToFrame(index) {
 }
 
 // ============================================================================================================================================
-// EVENT LISTENERS (Click, Drag&Drop...)
+// EVENT LISTENERS 
 // ============================================================================================================================================
 
 window.addEventListener('resize', () => {
@@ -1273,10 +1273,11 @@ window.addEventListener('resize', () => {
     }
 });
 
+// Playback Controls
 if (btnPlayPause) btnPlayPause.addEventListener('click', () => {
     if (!animationData) return;
     isPlaying = !isPlaying;
-    btnPlayPause.textContent = isPlaying ? '⏸' : '▶️';
+    btnPlayPause.textContent = isPlaying ? '⏸️' : '▶️';
 });
 
 if (btnReset) btnReset.addEventListener('click', () => {
@@ -1303,6 +1304,7 @@ speedButtons.forEach(btn => btn.addEventListener('click', () => {
     updateFPSDisplays();
 }));
 
+// View Mode Toggle (Avatar vs Lines), uses updateSceneToFrame
 if (viewModeToggle) {
     viewModeToggle.addEventListener('click', () => {
         isAvatarMode = !isAvatarMode;
@@ -1316,6 +1318,7 @@ if (viewModeToggle) {
     });
 }
 
+// Panel Toggles: Show/hide different information panels and ensure only one is open at a time
 const togglePanel = (panel) => {
     const isVisible = window.getComputedStyle(panel).display === 'block';
     [markersPanel, trajectoriesPanel, analogPanel, metadataPanel, vectorsPanel].forEach(p => { 
@@ -1329,7 +1332,7 @@ const togglePanel = (panel) => {
             if (animationData) createVectorsPanel();
         }
     } else {
-        if (panel === vectorsPanel) setVectorPanelState(false);
+        if (panel === vectorsPanel) setVectorPanelState(false)
     }
 
     updateToggleText(panelToggle, 'ui.markers', markersPanel);
@@ -1339,6 +1342,7 @@ const togglePanel = (panel) => {
     updateToggleText(vectorsToggle, 'ui.vectors', vectorsPanel);
 };
 
+// Events handled with onclick to ensure that only one panel can be open at a time, and that the toggle buttons reflect the current state
 if (panelToggle) panelToggle.onclick = () => togglePanel(markersPanel);
 if (trajectoriesToggle) trajectoriesToggle.onclick = () => togglePanel(trajectoriesPanel);
 if (analogToggle) analogToggle.onclick = () => togglePanel(analogPanel);
@@ -1347,7 +1351,7 @@ if (vectorsToggle) vectorsToggle.onclick = () => togglePanel(vectorsPanel);
 
 if (clearTrajectoriesBtn) clearTrajectoriesBtn.addEventListener('click', clearAllTrajectories);
 
-document.addEventListener('click', (e) => {
+/*document.addEventListener('click', (e) => {
     const isPanel = e.target.closest('#markers-panel, #trajectories-panel, #analog-panel, #metadata-panel, #vectors-panel');
     const isBtn = e.target.closest('.panel-toggle, .trajectories-toggle, .analog-toggle, .metadata-toggle, .vectors-toggle');
     const isLang = e.target.closest('.language-selector');
@@ -1361,8 +1365,10 @@ document.addEventListener('click', (e) => {
         updateToggleText(vectorsToggle, 'ui.vectors', vectorsPanel);
         setVectorPanelState(false);
     }
-});
+});*/
 
+
+// Event Listeners for uploading c3d files via Drag & Drop or File Input    
 document.addEventListener('dragover', (e) => { e.preventDefault(); document.body.style.backgroundColor = 'rgba(0, 123, 255, 0.1)'; });
 document.addEventListener('dragleave', (e) => { e.preventDefault(); document.body.style.backgroundColor = ''; });
 document.addEventListener('drop', (e) => {
