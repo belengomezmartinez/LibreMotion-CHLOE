@@ -26,11 +26,15 @@ export function addMarkerVector(nameA, nameB){
     );
     scene.add(arrowHelper);
 
+    const axesHelper = new THREE.AxesHelper(0.1); 
+    scene.add(axesHelper);
+
     const angleData = calculateVectorAnglesOverTime(nameA, nameB);
 
     activeVectors[id] = {
         nameA, nameB, 
         arrow: arrowHelper,
+        axes: axesHelper,
         color, 
         angleData
     };
@@ -95,8 +99,15 @@ export function updateVectors3D(frameData) {
                 vector.arrow.setLength(len);
             }
             vector.arrow.visible = true;
+
+            if (vector.axes) {
+                vector.axes.position.copy(start);
+                vector.axes.visible = true;
+            }
+
         } else {
             vector.arrow.visible = false;
+            if (vector.axes) vector.axes.visible = false;
         }
     });
 }
@@ -116,6 +127,7 @@ export function setVectorPanelState(isOpen) {
 export function clearAllVectors() {
     Object.values(activeVectors).forEach(v => {
         scene.remove(v.arrow);
+        if (v.axes) scene.remove(v.axes);
     });
     for (let key in activeVectors) delete activeVectors[key]; // Clear the activeVectors object (Instead of reassigning to a new empty object to preserve references)
     const container = document.getElementById('vector-graphs-section');
@@ -130,6 +142,7 @@ export function clearAllVectors() {
 export function removeVector(id) {
     if(activeVectors[id]) {
         scene.remove(activeVectors[id].arrow);
+        if (activeVectors[id].axes) scene.remove(activeVectors[id].axes);
         delete activeVectors[id];
         const plotDiv = document.getElementById(`wrapper-${id}`);
         if (plotDiv) plotDiv.remove();
