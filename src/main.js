@@ -240,7 +240,6 @@ function init() {
         
         loadAvatar(); 
         animate();
-        
         changeLanguage('es'); // Initial language is Spanish, can be changed by user
         initThemeToggle();
         
@@ -413,7 +412,7 @@ function clearScene() {
     
     Object.values(MARKER_CATEGORIES).forEach(category => category.visible = true);
     
-    [controlsContainer, markersPanel, metadataPanel, trajectoriesPanel, analogPanel].forEach(el => {
+    [controlsContainer, markersPanel, metadataPanel, trajectoriesPanel, analogPanel, vectorsPanel].forEach(el => {
         if(el) el.style.display = 'none';
     });
     
@@ -425,6 +424,7 @@ function clearScene() {
     updateToggleText(metadataToggle, 'ui.metadata', metadataPanel);
     updateToggleText(trajectoriesToggle, 'ui.trajectories', trajectoriesPanel);
     updateToggleText(analogToggle, 'ui.analog', analogPanel);
+    updateToggleText(vectorsToggle, 'ui.vectors', vectorsPanel);
 
     updateFrameButtons();
 }
@@ -742,63 +742,62 @@ function createVectorsPanel() {
     const panel = document.getElementById('vectors-panel-content');
     if (!panel) return;
 
-    if (!document.getElementById('vec-start')) {
-        const markerNames = Object.keys(markers);
-        panel.innerHTML = `
-            <div class="vector-selector-group">
-                <label>${t('vectors.select_start')}:</label>
-                <select id="vec-start" class="vector-select">
-                    ${markerNames.map(m => `<option value="${m}">${m}</option>`).join('')}
-                </select>
-                
-                <label>${t('vectors.select_end')}:</label>
-                <select id="vec-end" class="vector-select">
-                    ${markerNames.map(m => `<option value="${m}">${m}</option>`).join('')}
-                </select>
-                
-                <button id="btn-add-vector" class="primary-btn">${t('vectors.add')}</button>
-            </div>
-            <div id="vector-graphs-section"></div>
-        `;
+    const markerNames = Object.keys(markers);
+    panel.innerHTML = `
+        <div class="vector-selector-group">
+            <label>${t('vectors.select_start')}:</label>
+            <select id="vec-start" class="vector-select">
+                ${markerNames.map(m => `<option value="${m}">${m}</option>`).join('')}
+            </select>
+            
+            <label>${t('vectors.select_end')}:</label>
+            <select id="vec-end" class="vector-select">
+                ${markerNames.map(m => `<option value="${m}">${m}</option>`).join('')}
+            </select>
+            
+            <button id="btn-add-vector" class="primary-btn">${t('vectors.add')}</button>
+        </div>
+        <div id="vector-graphs-section"></div>
+    `;
     
-        const btnAdd = document.getElementById('btn-add-vector');
-        if (btnAdd) {
-            btnAdd.onclick = () => { // Usar .onclick asegura que solo haya uno
-                const start = document.getElementById('vec-start').value;
-                const end = document.getElementById('vec-end').value;
-                if (start !== end) {
-                    addMarkerVector(start, end);
-                } else {
-                    alert("Selecciona marcadores diferentes");
-                }
-            };
-        }
-    } else {
-        const labels = panel.querySelectorAll('.vector-selector-group label');
+    const btnAdd = document.getElementById('btn-add-vector');
+    if (btnAdd) {
+        btnAdd.onclick = () => { 
+            const start = document.getElementById('vec-start').value;
+            const end = document.getElementById('vec-end').value;
+            if (start !== end) {
+                addMarkerVector(start, end);
+            } else {
+                alert("Selecciona marcadores diferentes");
+            }
+        };
+    }
+    
+        /*const labels = panel.querySelectorAll('.vector-selector-group label');
         if (labels.length >= 2) {
             labels[0].textContent = `${t('vectors.select_start')}:`;
             labels[1].textContent = `${t('vectors.select_end')}:`;
         }
         const btnAdd = document.getElementById('btn-add-vector');
-        if (btnAdd) btnAdd.textContent = t('vectors.add');
+        if (btnAdd) btnAdd.textContent = t('vectors.add');*/
 
-        Object.keys(activeVectors).forEach(id => {
-            const graphDiv = document.getElementById(`plot-${id}`);
-            if (graphDiv && graphDiv.layout) {
-                Plotly.relayout(graphDiv, {
-                    'xaxis.title.text': t('vectors.axis_seconds'),
-                    'yaxis.title.text': t('vectors.axis_degrees')
-                });
-            }
-        });
-    }
+    Object.keys(activeVectors).forEach(id => {
+        const graphDiv = document.getElementById(`plot-${id}`);
+        if (graphDiv && graphDiv.layout) {
+            Plotly.relayout(graphDiv, {
+                'xaxis.title.text': t('vectors.axis_seconds'),
+                'yaxis.title.text': t('vectors.axis_degrees')
+            });
+        }
+    });
+    
 
-    const graphsSection = document.getElementById('vector-graphs-section');
+    /*const graphsSection = document.getElementById('vector-graphs-section');
     if (graphsSection && graphsSection.innerHTML === '') {
         Object.keys(activeVectors).forEach(id => {
             import('./plots.js').then(m => m.createVectorPlots(id));
         });
-    }
+    }*/
 }
 
 /**
@@ -945,13 +944,13 @@ function loadAvatar() {
                 // --- Finger Mapping --- 
                 // Pattern: Side (Right/Left) + Finger Name (Thumb/Index...) + Joint Index (1,2,3,4)
                 //const fingerRegex = /mixamorig1(Right|Left)Hand(Thumb|Index|Middle|Ring|Pinky)([1-4])/;
-                const fingerRegex = /mixamorig(Right|Left)Hand(Thumb|Index|Middle|Ring|Pinky)([1-4])/;
+                const fingerRegex = /mixamorig1(Right|Left)Hand(Thumb|Index|Middle|Ring|Pinky)([1-4])/;
                 const match = n.match(fingerRegex);
 
                 if (match) {
-                    const side = match[1];      // Lado
-                    const finger = match[2];    // Dedo
-                    const index = parseInt(match[3]) - 1; // Índice (1-4 -->0-3) 
+                    const side = match[1];      // Right/Left
+                    const finger = match[2];    // Finger name
+                    const index = parseInt(match[3]) - 1; // Index (1-4 -->0-3) 
                     
                     if (side === "Right") avatarBones.RightFingers[finger][index] = child;
                     else avatarBones.LeftFingers[finger][index] = child;
