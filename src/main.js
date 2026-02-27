@@ -792,12 +792,12 @@ function createVectorsPanel() {
     });
     
 
-    /*const graphsSection = document.getElementById('vector-graphs-section');
+    const graphsSection = document.getElementById('vector-graphs-section');
     if (graphsSection && graphsSection.innerHTML === '') {
         Object.keys(activeVectors).forEach(id => {
             import('./plots.js').then(m => m.createVectorPlots(id));
         });
-    }*/
+    }
 }
 
 /**

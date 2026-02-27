@@ -4,7 +4,7 @@ import { createVectorPlots } from './plots.js';
 
 export let activeVectors = {};
 export let isVectorPanelOpen = false;
-let vectorColors = [0x00ff00, 0xff00ff, 0xd48806, 0x00ffff];
+let vectorColors = [0xffa500, 0xff00ff, 0xd48806, 0x00ffff];
 
 /** 
  * Adds a vector representation between two markers in the 3D scene (THREE.ArrowHelper) 
