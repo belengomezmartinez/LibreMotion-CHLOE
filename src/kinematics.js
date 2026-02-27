@@ -2,6 +2,10 @@ import * as THREE from "three";
 import { avatar, avatarBones, avatarLoaded } from './main.js';
 import { FINGER_MARKERS } from "./constants.js";
 
+let info_Arm_Right = false;
+let info_Arm_Left = false;
+
+
 /**
  * Updates the 3D avatar's skeletal pose based on the current frame's marker cloud.
  * Implements a hierarchical positioning strategy and localized bone alignment.
@@ -57,7 +61,7 @@ export function updateAvatarPose(frameData) {
     if (positionFound) {
         avatar.position.x = finalRootPos.x;
         avatar.position.z = finalRootPos.z;
-        //avatar.position.y = finalRootPos.y - 1.0;
+        //avatar.position.y = finalRootPos.y - 0.85;
 
         // Grounding Logic: Find the lowest foot marker to prevent floating
         const footMarkers = ['LHEE', 'LTOE', 'LMT5', 'RHEE', 'RTOE', 'RMT5', 'LANK', 'RANK'];
@@ -75,9 +79,9 @@ export function updateAvatarPose(frameData) {
             console.log(`Posicionando avatar a nivel del suelo usando marcador ${footMarkers.find(name => getVectorFromMarker(frameData, name)?.y === lowestY)}`);
         }
         else {
-            // estimate a leg large of 0.9m
-            avatar.position.y = finalRootPos.y - 0.9; 
-            console.log(`Estimando posición del avatar a nivel del suelo con altura de 0.9m`);
+            // estimate a leg large of 0.85m
+            avatar.position.y = finalRootPos.y - 0.85; 
+            console.log(`Estimando posición del avatar a nivel del suelo con altura de 0.85m`);
         }
     }
 
@@ -183,7 +187,10 @@ export function updateAvatarPose(frameData) {
     if (rWRA && rWRB) wristRTarget = new THREE.Vector3().addVectors(rWRA, rWRB).multiplyScalar(0.5);
     else wristRTarget = rWRA || rWRB || rWRT;
     
-    if (rShoulder && rElbow && avatarBones.RightArm) alignBone(avatarBones.RightArm, rShoulder, rElbow);
+    if (rShoulder && rElbow && avatarBones.RightArm){
+        info_Arm_Right = true;
+        alignBone(avatarBones.RightArm, rShoulder, rElbow);
+    } 
     if (rElbow && wristRTarget && avatarBones.RightForeArm) alignBone(avatarBones.RightForeArm, rElbow, RForeArm || wristRTarget);
     if (wristRTarget && rHand && avatarBones.RightHand) alignBone(avatarBones.RightHand, wristRTarget, rHand); 
     
@@ -200,7 +207,10 @@ export function updateAvatarPose(frameData) {
     if (lWRA && lWRB) wristLTarget = new THREE.Vector3().addVectors(lWRA, lWRB).multiplyScalar(0.5);
     else wristLTarget = lWRT || lWRA || lWRB;
     
-    if (lShoulder && lElbow && avatarBones.LeftArm) alignBone(avatarBones.LeftArm, lShoulder, lElbow);
+    if (lShoulder && lElbow && avatarBones.LeftArm){
+        info_Arm_Left = true;
+        alignBone(avatarBones.LeftArm, lShoulder, lElbow);
+    } 
     if (lElbow && wristLTarget && avatarBones.LeftForeArm) alignBone(avatarBones.LeftForeArm, lElbow, lForeArm || wristLTarget);
     if (wristLTarget && lHand && avatarBones.LeftHand) alignBone(avatarBones.LeftHand, wristLTarget, lHand); 
     
@@ -276,6 +286,7 @@ function updateHandFingers(side, frameData) {
     let foreArmBone, ArmBone;
     let palmMarkerName;
     let wristMarkerName;
+    let infoArm;
 
     if (side === 'Right') {
         foreArmBone = avatarBones.RightForeArm;
@@ -283,32 +294,34 @@ function updateHandFingers(side, frameData) {
         handBone = avatarBones.RightHand;
         palmMarkerName = 'RPLM';
         wristMarkerName = 'RWRT'|| 'RWRA' || 'RWRB';
+        infoArm = info_Arm_Right;
     } else {
         foreArmBone = avatarBones.LeftForeArm;
         ArmBone = avatarBones.LeftArm;
         handBone = avatarBones.LeftHand;
         palmMarkerName = 'LPLM';
         wristMarkerName = 'LWRT'|| 'LWRA' || 'LWRB';
+        infoArm = info_Arm_Left;
     }
     const palmMarker = getVectorFromMarker(frameData, palmMarkerName);
     const wristMarker = getVectorFromMarker(frameData, wristMarkerName);
 
     // Avoids the T-pose when there is no info for the arm/forearm 
-    if (palmMarker && ArmBone && foreArmBone) {
-        const armWorldPos = new THREE.Vector3();
-        ArmBone.getWorldPosition(armWorldPos);
-        alignBone(ArmBone, armWorldPos, palmMarker);
-
+    if (palmMarker && ArmBone && foreArmBone && !infoArm) {
         const foreArmWorldPos = new THREE.Vector3();
         foreArmBone.getWorldPosition(foreArmWorldPos);
         alignBone(foreArmBone, foreArmWorldPos, palmMarker);
+
+        const armWorldPos = new THREE.Vector3();
+        ArmBone.getWorldPosition(armWorldPos);
+        alignBone(ArmBone, armWorldPos, foreArmWorldPos);
     }
 
-    // Optional: It forces the hand to emulate the wrist marker position, only works if there is no info for the forearm/arm 
-    /*if (handBone && wristMarker) {
+    // It forces the hand to emulate the wrist marker position, only works if there is no info for the forearm/arm 
+    if (handBone && wristMarker && !infoArm) {
         const localPosition = handBone.parent.worldToLocal(wristMarker.clone());
         handBone.position.copy(localPosition);
-    }*/
+    }
 
     const markersMap = FINGER_MARKERS[side];
     let fingersMap;
