@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { t } from './i18n.js';
 import { scene, animationData, trajectoriesList } from './main.js';
-import { range } from "three/tsl";
 
 export let trajectories = {};
 let trajectoryColors = [
@@ -24,6 +23,8 @@ export function initTrajectoryRangeControls() {
     if (rangeStartSlider && rangeEndSlider) {
         rangeStartSlider.addEventListener('input', updateTrajectoryRange);
         rangeEndSlider.addEventListener('input', updateTrajectoryRange);
+        rangeStartSlider.disabled = true;
+        rangeEndSlider.disabled = true;
     }
 }
 
@@ -125,6 +126,11 @@ export function toggleTrajectory(markerName) {
 function addTrajectory(markerName) {
     if (trajectories[markerName] || !animationData) return;
     const color = trajectoryColors[nextTrajectoryColorIndex++ % trajectoryColors.length];
+
+    if (rangeStartSlider && rangeEndSlider) {
+        rangeStartSlider.disabled = false;
+        rangeEndSlider.disabled = false;
+    }
     
     const start = trajectoryRange.start;
     const end = Math.min(trajectoryRange.end, animationData.length - 1);
@@ -194,6 +200,11 @@ function removeTrajectory(markerName) {
     if (btn) {
         btn.classList.remove('active');
         btn.textContent = '📉';
+    }
+
+    if (rangeStartSlider && rangeEndSlider && getActiveTrajectories().length === 0) {
+        rangeStartSlider.disabled = true;
+        rangeEndSlider.disabled = true;
     }
 }
 
