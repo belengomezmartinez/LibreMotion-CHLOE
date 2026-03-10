@@ -9,11 +9,11 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import { updateAvatarPose } from './kinematics.js';
+import { updateAvatarPose,info_Arm_Right, info_Arm_Left, setInfoArmRight, setInfoArmLeft} from './kinematics.js';
 import { openPlotsPanel, updatePlotlyTimeLine, isAnalogPlotsOpen, closePlotsPanel, createAnalogPlots, updateVectorPlotLine } from './plots.js';
 import { TRANSLATIONS, t, updateToggleText, updateTextContent, updateTitle, updateThemeButtons, updatePlotsTranslations } from './i18n.js';
 import { MARKER_CATEGORIES, CONECTIONS, MARKERS_COLOURS, HAND_MARKERS_SET, HEAD_MARKERS, ANALOG_COLOURS} from './constants.js';
-import { toggleTrajectory, clearAllTrajectories, trajectories, updateTrajectoriesPanel} from './trajectories.js';
+import { toggleTrajectory, clearAllTrajectories, trajectories, updateTrajectoriesPanel, initTrajectoryRangeControls, setupTrajectoryRangeControls} from './trajectories.js';
 import { addMarkerVector, updateVectors3D, isVectorPanelOpen, setVectorPanelState, clearAllVectors, activeVectors} from './vectors.js';
 
 
@@ -88,6 +88,7 @@ const analogToggle = document.getElementById('analog-toggle');
 const analogContent = document.getElementById('analog-content');
 const vectorsToggle = document.getElementById('vectors-toggle');
 const vectorsPanel = document.getElementById('vectors-panel');
+const resetRangeBtn = document.getElementById('reset-trajectory-range');
 
 
 // ============================================================================================================================================
@@ -116,6 +117,10 @@ function changeLanguage(lang) {
     updateTextContent('btn-select-start-marker', t('vectors.select_start'));
     updateTextContent('btn-select-end-marker', t('vectors.select_end'));
     updateTextContent('vectors-title', t('vectors.title'));
+    updateTextContent('trajectory-range-title', t('trajectories.range_title'));
+    updateTextContent('trajectories-active', t('trajectories.active'));
+
+    updateTitle('clear-trajectories', t('trajectories.clear_all'));
 
     // Update Control Tooltips
     updateTitle('btn-reset', t('controls.reset'));
@@ -242,6 +247,7 @@ function init() {
         animate();
         changeLanguage('es'); // Initial language is Spanish, can be changed by user
         initThemeToggle();
+        initTrajectoryRangeControls();
         
     } catch (error) {
         console.error("Error inicializando Three.js:", error);
@@ -376,6 +382,7 @@ function setupSceneFromData(data) {
     else if (analogContent) analogContent.innerHTML = `<div class="no-analog-data">${t('analog.no_data')}</div>`;
 
     createVectorsPanel();
+    setupTrajectoryRangeControls();
 
     // Playback Initialization
     isPlaying = true; 
@@ -399,6 +406,10 @@ function clearScene() {
     if (cabezaMarker) { scene.remove(cabezaMarker); cabezaMarker = null; }
     clearAllVectors();
     clearAllTrajectories();
+    const rangeStart = document.getElementById('trajectory-range-start');
+    const rangeEnd = document.getElementById('trajectory-range-end');
+    if (rangeStart) rangeStart.disabled = true;
+    if (rangeEnd) rangeEnd.disabled = true;
 
     // Avatar returns to T-pose and default position
     resetAvatar();
@@ -409,6 +420,8 @@ function clearScene() {
     lastLoadedData = null;
     frameIndex = 0;
     isPlaying = false;
+    setInfoArmRight(false);
+    setInfoArmLeft(false);
     
     Object.values(MARKER_CATEGORIES).forEach(category => category.visible = true);
     
@@ -1314,6 +1327,23 @@ if (viewModeToggle) {
         }
         
         updateSceneToFrame(frameIndex);
+    });
+}
+
+if (resetRangeBtn) {
+    resetRangeBtn.addEventListener('click', () => {
+        if (!animationData) return;
+        const startSlider = document.getElementById('trajectory-range-start');
+        const endSlider = document.getElementById('trajectory-range-end');
+        
+        if (startSlider && endSlider) {
+            startSlider.value = 0;
+            endSlider.value = animationData.length - 1;
+            
+            // Disparar eventos para actualizar
+            startSlider.dispatchEvent(new Event('input'));
+            endSlider.dispatchEvent(new Event('input'));
+        }
     });
 }
 

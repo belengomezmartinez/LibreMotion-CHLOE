@@ -46,7 +46,7 @@ def handle_c3d_upload():
             try:
                 return jsonify(result)
             except ValueError:
-                return jsonify({"error": "Error numérico (NaN) en el archivo procesado"}), 500
+                return jsonify({"error": "Numerical error (NaN) in the processed file"}), 500
         
     return jsonify({"error": "Error desconocido procesando el archivo"}), 500
 

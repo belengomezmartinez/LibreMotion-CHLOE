@@ -51,10 +51,31 @@
             </div>
 
             <div id="trajectories-panel">
-                <h3 id="trajectories-title">Trayectorias Activas</h3>
-                <div id="trajectories-list">
+                <div class="panel-header">
+                    <span id="trajectories-title">🔄 Trayectorias</span>
+                </div>
+                <div class="panel-content">
+                    <div class="trajectory-range-controls">
+                        <div class="range-header">
+                            <span id="trajectory-range-title">Rango de visualización</span>
+                            <button id="reset-trajectory-range" class="small-btn" title="Resetear al rango completo">↺</button>
+                        </div>
+                        <div class="range-slider-container">
+                            <label id="trajectory-range-start-label" class="range-label">Frame 0</label>
+                            <input type="range" id="trajectory-range-start" class="range-slider" min="0" max="100" value="0" disabled>
+                        </div>
+                        <div class="range-slider-container">
+                            <label id="trajectory-range-end-label" class="range-label">Frame 100</label>
+                            <input type="range" id="trajectory-range-end" class="range-slider" min="0" max="100" value="100" disabled>
+                        </div>
                     </div>
-                <button id="clear-trajectories" class="clear-trajectories">Limpiar Todas las Trayectorias</button>
+                    
+                    <div class="trajectories-header">
+                        <span id="trajectories-active">Trayectorias Activas</span>
+                        <button id="clear-trajectories" class="clear-btn" title="Limpiar todas las trayectorias">🗑️</button>
+                    </div>
+                    <div id="trajectories-list" class="trajectories-list"></div>
+                </div>
             </div>
 
             <div id="analog-panel">

@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { t } from './i18n.js';
 import { scene, animationData, trajectoriesList } from './main.js';
+import { range } from "three/tsl";
 
 export let trajectories = {};
 let trajectoryColors = [
@@ -8,6 +9,95 @@ let trajectoryColors = [
     0xff9ff3, 0x54a0ff, 0x5f27cd, 0x00d2d3, 0xff9f43, 0x10ac84, 0xee5a24
 ];
 let nextTrajectoryColorIndex = 0;
+export let trajectoryRange = { start: 0, end: Infinity };
+let rangeStartSlider, rangeEndSlider, rangeStartLabel, rangeEndLabel;
+
+/**
+ * Initializes the trajectory range sliders and their event listeners for real-time updates.
+ */
+export function initTrajectoryRangeControls() {
+    rangeStartSlider = document.getElementById('trajectory-range-start');
+    rangeEndSlider = document.getElementById('trajectory-range-end');
+    rangeStartLabel = document.getElementById('trajectory-range-start-label');
+    rangeEndLabel = document.getElementById('trajectory-range-end-label');
+    
+    if (rangeStartSlider && rangeEndSlider) {
+        rangeStartSlider.addEventListener('input', updateTrajectoryRange);
+        rangeEndSlider.addEventListener('input', updateTrajectoryRange);
+    }
+}
+
+/**
+ * Updates the trajectory range based on slider inputs, ensuring start is not greater than end.
+ */
+function updateTrajectoryRange() {
+    if(!animationData) return;
+    const totalFrames = animationData.length - 1;
+    let start = parseInt(rangeStartSlider.value);
+    let end = parseInt(rangeEndSlider.value);
+
+    if (start > end) {
+        if (this === rangeStartSlider){
+            end = start;
+            rangeEndSlider.value = end;
+        } 
+        else{
+            start = end;  
+            rangeStartSlider.value = start; 
+        } 
+    }
+    
+    trajectoryRange.start = start;
+    trajectoryRange.end = end;
+
+    if (rangeStartLabel) {
+        rangeStartLabel.textContent = `${t('controls.frame')} ${start}`;
+    }
+    if (rangeEndLabel) {
+        rangeEndLabel.textContent = `${t('controls.frame')} ${end}`;
+    }
+    updateAllTrajectoryPoints();
+}
+
+/**
+ * Configures the range sliders based on the total number of frames in the animation data.
+ */
+export function setupTrajectoryRangeControls() {
+    if (!animationData) return;
+    
+    const totalFrames = animationData.length - 1;
+    
+    if (rangeStartSlider && rangeEndSlider) {
+        rangeStartSlider.max = totalFrames;
+        rangeStartSlider.value = 0;
+        rangeEndSlider.max = totalFrames;
+        rangeEndSlider.value = totalFrames;
+        
+        rangeStartSlider.disabled = false;
+        rangeEndSlider.disabled = false;
+        
+        trajectoryRange.start = 0;
+        trajectoryRange.end = totalFrames;
+        
+        if (rangeStartLabel) {
+            rangeStartLabel.textContent = `${t('controls.frame')} 0`;
+        }
+        if (rangeEndLabel) {
+            rangeEndLabel.textContent = `${t('controls.frame')} ${totalFrames}`;
+        }
+    }
+}
+
+/**
+ * Updates the trajectory points for all active trajectories, ensuring they reflect the current range selection.
+ * This is called whenever the trajectory range sliders are adjusted to ensure the displayed paths are accurate.
+ */
+function updateAllTrajectoryPoints() {
+    Object.keys(trajectories).forEach(markerName => {
+        updateTrajectoryPoints(markerName);
+    });
+}
+
 
 /**
  * Orchestrates the creation or removal of a 3D movement trajectory for a marker.
@@ -36,8 +126,12 @@ function addTrajectory(markerName) {
     if (trajectories[markerName] || !animationData) return;
     const color = trajectoryColors[nextTrajectoryColorIndex++ % trajectoryColors.length];
     
+    const start = trajectoryRange.start;
+    const end = Math.min(trajectoryRange.end, animationData.length - 1);
+    const numPoints = end - start + 1;
+    
     const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(animationData.length * 3); // Pre-allocate memory for all frames
+    const positions = new Float32Array(numPoints * 3); // Pre-allocate memory for the active range
     geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
     
     const material = new THREE.LineBasicMaterial({ color: color, linewidth: 2, transparent: true, opacity: 0.7 });
@@ -55,17 +149,33 @@ function addTrajectory(markerName) {
 function updateTrajectoryPoints(markerName) {
     const t = trajectories[markerName];
     if (!t || !animationData) return;
+
+    const start = trajectoryRange.start;
+    const end = Math.min(trajectoryRange.end, animationData.length - 1);
     
     const points = [];
-    animationData.forEach(frame => {
+    for (let i = start; i <= end; i++) {
+        const frame = animationData[i];
         const c = frame[markerName];
         if (c && c.length === 3) points.push(c[0], c[1], c[2]);
         else points.push(0,0,0); // Fill with zeros if data is missing to maintain index alignment
-    });
+    }
     
     const pos = t.line.geometry.attributes.position.array;
-    for(let i=0; i<points.length; i++) pos[i] = points[i];
-    t.line.geometry.attributes.position.needsUpdate = true;
+    if (pos.length !== points.length) {
+        const newGeometry = new THREE.BufferGeometry();
+        const newPositions = new Float32Array(points);
+        newGeometry.setAttribute('position', new THREE.BufferAttribute(newPositions, 3));
+        t.line.geometry.dispose();
+        t.line.geometry = newGeometry;
+    } else {
+        for(let i = 0; i < points.length; i++) {
+            pos[i] = points[i];
+        }
+        t.line.geometry.attributes.position.needsUpdate = true;
+    }
+    //for(let i=0; i<points.length; i++) pos[i] = points[i];
+    //t.line.geometry.attributes.position.needsUpdate = true;
 }
 
 /**
@@ -94,6 +204,11 @@ export function clearAllTrajectories() {
     getActiveTrajectories().forEach(m => removeTrajectory(m));
     trajectories = {};
     updateTrajectoriesPanel();
+    if (rangeStartSlider && rangeEndSlider) {
+        rangeStartSlider.disabled = true;
+        rangeEndSlider.disabled = true;
+    }
+
 }
 
 function getActiveTrajectories() {
@@ -129,7 +244,7 @@ export function updateTrajectoriesPanel() {
                 <button class="trajectory-btn remove" data-marker="${markerName}" title="${t('trajectories.remove')}">✕</button>
             </div>
         `;
-        item.querySelector('.remove').addEventListener('click', () => { removeTrajectory(markerName); updateTrajectoriesPanel(trajectoriesList); });
+        item.querySelector('.remove').addEventListener('click', () => { removeTrajectory(markerName); updateTrajectoriesPanel(); });
         trajectoriesList.appendChild(item);
     });
 }

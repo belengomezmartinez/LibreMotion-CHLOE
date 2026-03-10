@@ -28,13 +28,12 @@ export const TRANSLATIONS = {
             non_standard: "Marcador no estandarizado"
         },
         trajectories: {
-            title: "Trayectorias Activas", 
+            title: "Trayectorias", 
             active: "Trayectorias Activas",
             no_active: "No hay trayectorias activas",
-            remove: "Eliminar trayectoria",
             clear_all: "Limpiar Todas las Trayectorias",
-            show: "Mostrar Trayectoria",
-            hide: "Ocultar Trayectoria" 
+            range_title: "Rango de visualización",
+            range_frame: "Frame"
         },
         analog: {
             title: "Datos Analógicos",
@@ -148,13 +147,12 @@ export const TRANSLATIONS = {
             non_standard: "Non-standard marker"
         },
         trajectories: {
-            title: "Active Trajectories",
+            title: "Trajectories",
             active: "Active Trajectories",
             no_active: "No active trajectories",
-            remove: "Remove trajectory",
             clear_all: "Clear All Trajectories",
-            show: "Show Trajectory",
-            hide: "Hide Trajectory"
+            range_title: "Visualization Range",
+            range_frame: "Frame"
         },
         analog: {
             title: "Analog Data",
@@ -268,13 +266,12 @@ export const TRANSLATIONS = {
             non_standard: "Marqueur non standard"
         },
         trajectories: {
-            title: "Trajectoires Actives",
+            title: "Trajectoires",
             active: "Trajectoires Actives",
             no_active: "Aucune trajectoire active",
-            remove: "Supprimer la trajectoire",
             clear_all: "Effacer toutes les trajectoires",
-            show: "Afficher la trajectoire",
-            hide: "Masquer la trajectoire"
+            range_title: "Plage d'affichage",
+            range_frame: "Frame"
         },
         analog: {
             title: "Données Analogiques",
