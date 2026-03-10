@@ -2,9 +2,23 @@ import * as THREE from "three";
 import { avatar, avatarBones, avatarLoaded } from './main.js';
 import { FINGER_MARKERS } from "./constants.js";
 
-let info_Arm_Right = false;
-let info_Arm_Left = false;
+export let info_Arm_Right = false;
+export let info_Arm_Left = false;
 
+/**
+ * Helper function to update info_Arm_Right from main.js. 
+ * @param {boolean} value 
+ */
+export function setInfoArmRight(value) {
+    info_Arm_Right = value;
+}
+/**
+ * Helper function to update info_Arm_Left from main.js. 
+ * @param {boolean} value 
+ */
+export function setInfoArmLeft(value) {
+    info_Arm_Left = value;
+}
 
 /**
  * Updates the 3D avatar's skeletal pose based on the current frame's marker cloud.
@@ -16,7 +30,7 @@ export function updateAvatarPose(frameData) {
 
     // --- ROOT POSITIONING ---
     // Ideal scenario: use pelvis markers to determine the avatar's global position
-    const pelvisMarkers = ['SACR', 'RASI', 'LASI', 'RPSI', 'LPSI', 'VSAC']; 
+    const pelvisMarkers = ['SACR', 'RASI', 'LASI', 'RPSI', 'LPSI']; 
     let pelvisPos = new THREE.Vector3(0, 0, 0);
     let activePelvis = 0;
 
@@ -194,6 +208,7 @@ export function updateAvatarPose(frameData) {
     if (rElbow && wristRTarget && avatarBones.RightForeArm) alignBone(avatarBones.RightForeArm, rElbow, RForeArm || wristRTarget);
     if (wristRTarget && rHand && avatarBones.RightHand) alignBone(avatarBones.RightHand, wristRTarget, rHand); 
     
+    updateHandFingers('Right', frameData);
     
     const lShoulder = getVectorFromMarker(frameData, 'LSHO');
     const lElbow = getVectorFromMarker(frameData, 'LELB');
@@ -214,6 +229,7 @@ export function updateAvatarPose(frameData) {
     if (lElbow && wristLTarget && avatarBones.LeftForeArm) alignBone(avatarBones.LeftForeArm, lElbow, lForeArm || wristLTarget);
     if (wristLTarget && lHand && avatarBones.LeftHand) alignBone(avatarBones.LeftHand, wristLTarget, lHand); 
     
+    updateHandFingers('Left', frameData);
 
     // --- Lower Limbs ---
     const rKnee = getVectorFromMarker(frameData, 'RKNE');
@@ -269,10 +285,6 @@ export function updateAvatarPose(frameData) {
     if (lHeel && lToe && avatarBones.LeftToe) {
         alignBone(avatarBones.LeftToe, lHeel, lToe);
     }
-
-    // --- Hand Extremities ---
-    updateHandFingers('Right', frameData);
-    updateHandFingers('Left', frameData);
     
 } 
 
