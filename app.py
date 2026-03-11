@@ -48,7 +48,7 @@ def handle_c3d_upload():
             except ValueError:
                 return jsonify({"error": "Numerical error (NaN) in the processed file"}), 500
         
-    return jsonify({"error": "Error desconocido procesando el archivo"}), 500
+    return jsonify({"error": "Unknown error processing the file"}), 500
 
 @app.route('/')
 def serve_index(): return send_from_directory(app.static_folder, 'index.html')
@@ -58,7 +58,8 @@ if __name__ == '__main__':
     # as Docker uses the command defined in the Dockerfile:
     # ENV FLASK_PORT=8080
     # ENV FLASK_WORKERS=4
-    # CMD gunicorn --bind 0.0.0.0:$FLASK_PORT --workers $FLASK_WORKERS app:app
+    # ENV FLASK_TIMEOUT=120
+    # CMD gunicorn --bind 0.0.0.0:$FLASK_PORT --workers $FLASK_WORKERS --timeout $FLASK_TIMEOUT app:app
     #
     # This block is maintained specifically for local development and 
     # rapid testing by running 'python app.py' directly.
