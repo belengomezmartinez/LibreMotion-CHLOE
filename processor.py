@@ -276,7 +276,7 @@ def process_c3d_file(c3d_file_path):
 
     # Architecture Robustness: Prevents crashes from Big-Endian (SGI/MIPS) files.
     except RuntimeError as e:
-        if "MIPS processor tipo not supported" in str(e):
+        if "MIPS processor type not supported" in str(e):
             return {"error_tipo": "ARCH_UNSUPPORTED", "message": "Formato SGI/MIPS (Big Endian) no soportado actualmente."}
         raise e 
 
