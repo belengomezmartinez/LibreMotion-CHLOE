@@ -74,9 +74,6 @@ export function setupTrajectoryRangeControls() {
         rangeEndSlider.max = totalFrames;
         rangeEndSlider.value = totalFrames;
         
-        rangeStartSlider.disabled = false;
-        rangeEndSlider.disabled = false;
-        
         trajectoryRange.start = 0;
         trajectoryRange.end = totalFrames;
         
