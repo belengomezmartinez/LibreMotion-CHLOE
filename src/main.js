@@ -41,7 +41,7 @@ export let avatarBones = {
     Hips: null
 };
 export let avatarLoaded = false;
-export let isAvatarMode = true; // true = the avatar is shown, false = the lines are shown
+export let isAvatarMode = false; // true = the avatar is shown, false = the lines are shown
 export let originalFPS = 0;
 
 let camera, renderer, controls, ambientLight;
@@ -1001,12 +1001,14 @@ function loadAvatar() {
         });
 
         scene.add(avatar);
+        avatar.visible = isAvatarMode;
         avatarLoaded = true;
         console.log("Avatar cargado y huesos detectados:", avatarBones);
         
         // Visualizes the skeleton wireframe for debugging purposes
         skeletonHelper = new THREE.SkeletonHelper(avatar);
         scene.add(skeletonHelper);
+        skeletonHelper.visible = isAvatarMode; // Hidden by default, can be toggled for debugging
 
     }, undefined, (error) => {
         console.error("Error cargando el avatar:", error);
