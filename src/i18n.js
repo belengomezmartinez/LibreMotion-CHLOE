@@ -1,4 +1,3 @@
-
 import { currentLang } from './main.js'; 
 
 export const TRANSLATIONS = {
@@ -33,7 +32,10 @@ export const TRANSLATIONS = {
             no_active: "No hay trayectorias activas",
             clear_all: "Limpiar Todas las Trayectorias",
             range_title: "Rango de visualización",
-            range_frame: "Frame"
+            range_frame: "Frame",
+            remove: "Eliminar trayectoria", 
+            hide: "Ocultar trayectoria",
+            show: "Mostrar trayectoria"
         },
         analog: {
             title: "Datos Analógicos",
@@ -152,7 +154,10 @@ export const TRANSLATIONS = {
             no_active: "No active trajectories",
             clear_all: "Clear All Trajectories",
             range_title: "Visualization Range",
-            range_frame: "Frame"
+            range_frame: "Frame", 
+            remove: "Remove trajectory", 
+            hide: "Hide trajectory",
+            show: "Show trajectory"
         },
         analog: {
             title: "Analog Data",
@@ -271,7 +276,10 @@ export const TRANSLATIONS = {
             no_active: "Aucune trajectoire active",
             clear_all: "Effacer toutes les trajectoires",
             range_title: "Plage d'affichage",
-            range_frame: "Frame"
+            range_frame: "Frame", 
+            remove: "Supprimer la trajectoire",
+            hide: "Masquer la trajectoire",
+            show: "Afficher la trajectoire"
         },
         analog: {
             title: "Données Analogiques",
