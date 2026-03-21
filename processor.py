@@ -19,12 +19,12 @@ STANDARD_MAP = {
     "C7": "C7", "C7_SPINE": "C7",
     "T10": "T10", "T10_SPINE": "T10",
     "CLAV": "CLAV", "CLAVICLE": "CLAV",
-    "STRN": "STRN", "STERNUM": "STRN",
+    "STRN": "STRN", "STERNUM": "STRN", 
 
-    "LASI":"LASI", "LFWT": "LASI", "LAntInfIliacSpine": "LASI", "L_ASIS": "LASI",
-    "RASI":"RASI", "RFWT": "RASI", "RAntInfIliacSpine": "RASI", "R_ASIS": "RASI",
-    "LPSI":"LPSI", "LBWT": "LPSI", "LPostInfIliacSpine": "LPSI",
-    "RPSI":"RPSI", "RBWT": "RPSI", "RPostInfIliacSpine": "RPSI",
+    "LASI":"LASI", "LFWT": "LASI", "LAntInfIliacSpine": "LASI", "L_ASIS": "LASI", "L.ASIS": "LASI",
+    "RASI":"RASI", "RFWT": "RASI", "RAntInfIliacSpine": "RASI", "R_ASIS": "RASI", "R.ASIS": "RASI",
+    "LPSI":"LPSI", "LBWT": "LPSI", "LPostInfIliacSpine": "LPSI", "L_PSI": "LPSI", "L.PSIS": "LPSI",
+    "RPSI":"RPSI", "RBWT": "RPSI", "RPostInfIliacSpine": "RPSI", "R_PSI": "RPSI", "R.PSIS": "RPSI",
     "SACR": "SACR", "SACRAL": "SACR", "VSAC": "SACR",
 
     "LSHO": "LSHO", "L_SHOULDER": "LSHO",
@@ -41,20 +41,20 @@ STANDARD_MAP = {
     "RWRB": "RWRB", "RWRA": "RWRA", 
     "R_WRIST": "RWRT","RWRIST": "RWRT","RWRT":"RWRT", "RWRI": "RWRT",
 
-    "LTHI": "LTHI", "L_THIGH": "LTHI",
-    "LKNE": "LKNE", "L_KNEE": "LKNE",
-    "LSHN": "LSHN", "L_SHIN": "LSHN", "LTIB": "LSHN",
-    "LANK": "LANK", "L_ANKLE": "LANK",
-    "LHEE": "LHEE", "L_HEEL": "LHEE",
-    "LTOE": "LTOE", "L_TOE": "LTOE",
-    "LMT5": "LMT5", "L_FOOT": "LMT5",
+    "LTHI": "LTHI", "L_THIGH": "LTHI", "L.Ant.Fem.": "LTHI", 
+    "LKNE": "LKNE", "L_KNEE": "LKNE", "LLFC": "LKNE", "L.Knee": "LKNE",
+    "LSHN": "LSHN", "L_SHIN": "LSHN", "LTIB": "LSHN", "LSHA": "LSHN", "LTTB": "LSHN", "L.Ant.Tib.": "LSHN",
+    "LANK": "LANK", "L_ANKLE": "LANK", "LLMA":"LANK", "L.Ankle": "LANK",
+    "LHEE": "LHEE", "L_HEEL": "LHEE", "LCAL":"LHEE", "L.Heel": "LHEE",
+    "LTOE": "LTOE", "L_TOE": "LTOE", "L.TO": "LTOE", "L.Toe": "LTOE",
+    "LMT5": "LMT5", "L_FOOT": "LMT5", 
 
-    "RTHI": "RTHI", "R_THIGH": "RTHI",
-    "RKNE": "RKNE", "R_KNEE": "RKNE",
-    "RSHN": "RSHN", "R_SHIN": "RSHN", "RTIB": "RSHN",
-    "RANK": "RANK", "R_ANKLE": "RANK",
-    "RHEE": "RHEE", "R_HEEL": "RHEE",
-    "RTOE": "RTOE", "R_TOE": "RTOE",
+    "RTHI": "RTHI", "R_THIGH": "RTHI", "R.Ant.Fem.": "RTHI",
+    "RKNE": "RKNE", "R_KNEE": "RKNE", "RLFC": "RKNE", "R.Knee": "RKNE",
+    "RSHN": "RSHN", "R_SHIN": "RSHN", "RTIB": "RSHN", "RSHA": "RSHN", "RTTB": "RSHN", "R.Ant.Tib.": "RSHN",
+    "RANK": "RANK", "R_ANKLE": "RANK", "RLMA":"RANK", "R.Ankle": "RANK",
+    "RHEE": "RHEE", "R_HEEL": "RHEE", "RCAL":"RHEE", "R.Heel": "RHEE",
+    "RTOE": "RTOE", "R_TOE": "RTOE", "R.TO": "RTOE", "R.Toe": "RTOE",
     "RMT5": "RMT5", "R_FOOT": "RMT5",
     
     "RBHD": "RBHD", "R_BACK_HEAD": "RBHD",
@@ -123,8 +123,17 @@ STANDARD_ANALOG_MAP = {
     'acelerometro': {'keywords': ['ACC', 'ACCEL'], 'color': 0x26de81},
     'giroscopio': {'keywords': ['GYRO'], 'color': 0xa55eea},
     'angulo': {'keywords': ['ANGLE', 'ANG'], 'color': 0xf7b731}, 
+    'potencia': {'keywords': ['POWER'], 'color': 0x32a6a8},
     'desconocido': {'keywords': [], 'color': 0x888888}
 }
+
+ANALOG_MARKERS = {
+    'fuerza' : ['LAnkleForce', 'RAnkleForce', 'LKneeForce', 'RKneeForce', 'LHipForce', 'RHipForce', 'Force', 'ForceX', 'ForceY', 'ForceZ'],
+    'momento' : ['LAnkleMoment', 'RAnkleMoment', 'LKneeMoment', 'RKneeMoment', 'LHipMoment', 'RHipMoment', 'Moment', 'MomentX', 'MomentY', 'MomentZ'],
+    'potencia' : ['LAnklePower', 'RAnklePower', 'LKneePower', 'RKneePower', 'LHipPower', 'RHipPower', 'Power'],
+    'angulo': ['LAnkleAngles', 'LAbsAnkleAngle','RAnkleAngles','RAbsAnkleAngle', 'LKneeAngles', 'RKneeAngles', 'LHipAngles', 'RHipAngles', 'LFootProgressAngles', 'RFootProgressAngles', 'LPelvisAngles', 'RPelvisAngles', 'LHeadAngles', 'RHeadAngles', 'LThoraxAngles', 'RThoraxAngles', 'LNeckAngles', 'RNeckAngles', 'LSpineAngles', 'RSpineAngles', 'LShoulderAngles', 'RShoulderAngles', 'LElbowAngles', 'RElbowAngles', 'LWristAngles', 'RWristAngles', 'Angles']
+}
+
 
 # ======================================================================
 # BIOMECHANICAL PROCESSING UTILITIES
@@ -148,11 +157,22 @@ def safe_float(val, default=0.0):
 
 def scalar(c3d_data):
     """
-    Automatic unit detection (Meters vs. Millimeters).
+    Tries to determine the correct scale factor for marker coordinates by checking the 'UNITS' parameter.
+    As fallback, it performs automatic unit detection (Meters vs. Millimeters).
     If values exceed 50 units, it assumes mm and applies a 10^{-3} scaling factor.
     Input: c3d_data (dict) - parsed C3D data structure
     Output: float - scale factor to convert coordinates to meters
     """
+    params = c3d_data['parameters'].get('POINT', {})
+    try:
+        units_list = params.get('UNITS', {}).get('value', [])
+        if units_list and len(units_list) > 0:
+            u = str(units_list[0]).lower().strip() 
+            if 'mm'==u or 'millimeter'==u or 'millimeters'==u or 'mm' in u: return 0.001
+            if 'cm'==u or 'centimeter'==u or 'centimeters'==u or 'cm' in u: return 0.01
+            if 'm'==u or 'meter'==u or 'meters'==u or 'm' in u: return 1.0
+    except:
+        print("There is no UNITS parameter available, proceeding with auto-detection based on coordinate values.")
     try:
         points = c3d_data['data']['points']
         n_frames = points.shape[2]
@@ -167,7 +187,8 @@ def scalar(c3d_data):
             except: continue
         if max_coord_val > 50.0: return 0.001 
         return 1.0 
-    except: return 0.001 
+    except: return 0.001
+    
 
 def classify_analog(canal):
     """
@@ -223,7 +244,7 @@ def extract_analog_data(c3d):
         labels = c3d['parameters'].get('ANALOG', {}).get('LABELS', {}).get('value', [])
         raw_rate = c3d['parameters'].get('ANALOG', {}).get('RATE', {}).get('value', [1000])
         if isinstance(raw_rate, list): raw_rate = raw_rate[0]
-        rate = safe_float(raw_rate, 1000.0)
+        rate = round(safe_float(raw_rate, 1000.0),2)
         if rate <= 0: rate = 1000.0
 
         if len(analog_data.shape) == 3: 
@@ -253,7 +274,7 @@ def extract_analog_data(c3d):
         output['active_channels'] = active_count
         output['total_channels'] = n_channels
         output['total_samples'] = n_samples
-        output['duration_seconds'] = safe_float(n_samples / rate)
+        output['duration_seconds'] = round(safe_float(n_samples / rate), 2)
         return output
     except Exception as e:
         print(f"Error analog: {e}")
@@ -284,8 +305,11 @@ def process_c3d_file(c3d_file_path):
     except ValueError as e:
         if "is not an INT" in str(e) or "FRAMES" in str(e):
             return {"error_tipo": "STANDARD_VIOLATION", "message": "El archivo viola el estándar C3D (Parámetro FRAMES es Float, se espera Int)."}
-        raise e
-
+        raise e 
+    except TypeError as e:
+        if not c3d['parameters']:
+            return {"error_tipo": "READ_ERROR", "message": "Archivo C3D leído pero sin parámetros disponibles, posiblemente corrupto o no estándar."}       
+        raise e      
     except Exception as e:
         return {"error_tipo": "READ_ERROR", "message": f"No se pudo leer el archivo C3D: {str(e)}"}
 
@@ -295,18 +319,36 @@ def process_c3d_file(c3d_file_path):
         # Extracts Point Sample Rate and ensures a valid numeric FPS for time calculations.
         raw_fps = point_params.get('RATE', {}).get('value', [100])
         if isinstance(raw_fps, list): raw_fps = raw_fps[0]
-        fps = safe_float(raw_fps, 100.0)
+        fps = round(safe_float(raw_fps, 100.0), 2)
         if fps <= 0: fps = 100.0
 
         scale_factor = scalar(c3d)
-        labels = point_params.get('LABELS', {}).get('value', [])
-        data = c3d['data']['points']
         
+        labels = point_params.get('LABELS', {}).get('value', [])
+        # Some c3d files (e.g. Sample12 from c3d.org) have more than one set of labels (LABELS2) that may contain additional markers.
+        if 'LABELS2' in point_params:
+            labels2 = point_params.get('LABELS2', {}).get('value', [])
+            labels.extend(labels2)
+
+        data = c3d['data']['points']
+
         n_markers = data.shape[1]
         n_frames = data.shape[2]
         dims = data.shape[0] 
 
         frames = []
+
+        extra_analog_from_points = {}
+        nombres_analogicos_objetivo = []
+        for lista in ANALOG_MARKERS.values():
+            nombres_analogicos_objetivo.extend([n.upper() for n in lista])
+
+        indices_analogicos = []
+        for i, label in enumerate(labels):
+            name_clean = label.split(':')[-1].strip().upper()
+            if any(patron in name_clean for patron in nombres_analogicos_objetivo):
+                indices_analogicos.append(i)
+                extra_analog_from_points[label.split(':')[-1].strip()] = []
         
         for f in range(n_frames):
             frame_data = {}
@@ -315,10 +357,15 @@ def process_c3d_file(c3d_file_path):
                 if i >= n_markers: break
                 
                 # Standardizes label names by removing manufacturer prefixes (e.g., 'Vicon:' or 'Subject1:')
-                try: name_clean = label.split(':')[-1] 
-                except: name_clean = f"M{i}" # Fallback to generic naming if label is malformed (M0, M1, etc.)
-                name_standarized = STANDARD_MAP.get(name_clean, name_clean)
+                name_clean = label.split(':')[-1].strip() 
                 
+                if i in indices_analogicos:
+                    val = data[0, i, f] 
+                    extra_analog_from_points[name_clean].append(safe_float(val))
+                    continue
+
+                name_standarized = STANDARD_MAP.get(name_clean, name_clean)
+
                 # handles cases where points data has 4 or more dimensions (e.g., residuals/confidence) by only processing the first 3 as coordinates
                 if dims >= 3:
                     coords = [data[0, i, f], data[1, i, f], data[2, i, f]]
@@ -328,8 +375,28 @@ def process_c3d_file(c3d_file_path):
                         has_data = True
             if has_data: frames.append(frame_data)
 
-        duration = safe_float(n_frames / fps)
+        duration = round(safe_float(n_frames / fps), 2)
         analog = extract_analog_data(c3d)
+
+        count = 0
+        if extra_analog_from_points:
+            if analog is None:
+                analog = {
+                    'channels': {},  
+                    'classification': {}, 
+                    'sample_rate_hz': fps, 
+                    'tipos_disponibles': list(STANDARD_ANALOG_MAP.keys())
+                }
+            for l_extra, values in extra_analog_from_points.items():
+                if np.all(values == 0.0) or np.all(np.isnan(data)): continue
+                count += 1
+                analog['channels'][l_extra] = values
+                clas = classify_analog(l_extra)
+                analog['classification'][l_extra] = {'tipo': clas['tipo'], 'color': clas['color'], 'index': count}
+                analog['total_channels'] = analog.get('total_channels', 0) + 1
+                analog['total_samples'] = len(values)
+            analog['has_analog_data'] = True
+            analog['active_channels'] = analog.get('active_channels', 0) + count
         
         return {
             "success": True, 

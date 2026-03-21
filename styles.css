@@ -3,7 +3,7 @@
    Sections:
    1. GLOBAL VARIABLES & THEMES
    2. BASE STYLES & LAYOUT
-   3. NAVIGATION & SELECTORS (Theme, Language, Uploader)
+   3. NAVIGATION & SELECTORS (Theme, Language, Uploader, Reset View)
    4. PLAYBACK CONTROLS
    5. SIDE PANELS (Markers, Metadata, Analog, Vectors)
    6. PLOTTING MODULE (Plotly Integration)
@@ -368,6 +368,15 @@ body.light-mode .analog-channel[data-channel-type="angulo"] .analog-type-badge {
     color: #b37400 !important;
 }
 
+body.light-mode .analog-channel[data-channel-type="potencia"] {
+    border-left-color: #32a6a8;
+}
+
+body.light-mode .analog-channel[data-channel-type="potencia"] .channel-name,
+body.light-mode .analog-channel[data-channel-type="potencia"] .analog-type-badge {
+    color: #32a6a8 !important;
+}
+
 body.light-mode #metadata-panel {
     background: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(0, 0, 0, 0.2);
@@ -603,6 +612,22 @@ body.light-mode .clear-btn:hover {
     background: rgba(220, 53, 69, 0.2);
 }
 
+body.light-mode .camera-tools {
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+body.light-mode .tool-btn {
+    background: rgba(0, 0, 0, 0.05);
+    color: #007bff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode .tool-btn:hover {
+    background: rgba(0, 0, 0, 0.15);
+    color: #000;
+}
+
 /* 2. BASE STYLES & LAYOUT 
    -------------------------------------------------------------------------- */
 
@@ -631,7 +656,7 @@ canvas {
 }
 
 
-/* 3. NAVIGATION & SELECTORS (Theme, Language, Uploader)
+/* 3. NAVIGATION & SELECTORS (Theme, Language, Uploader, Reset View)
    -------------------------------------------------------------------------- */
 .theme-toggle {
     position: absolute;
@@ -785,6 +810,37 @@ canvas {
     to { transform: rotate(360deg); }
 }
 
+.camera-tools {
+    position: absolute;
+    bottom: 80px;
+    right: 150px; 
+    z-index: 95;
+    display: flex;
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 4px;
+    border-radius: 6px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tool-btn {
+    background: rgba(255, 255, 255, 0.05);
+    color: #aaa;
+    border: 1px solid transparent;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8em;
+    transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
 /* 4. PLAYBACK CONTROLS 
    -------------------------------------------------------------------------- */
 #controls-container {
@@ -897,6 +953,7 @@ canvas {
 .frame-btn:disabled:hover {
     background: rgba(255, 255, 255, 0.1);
 }
+
 
 /* 5. SIDE PANELS 
    -------------------------------------------------------------------------- */

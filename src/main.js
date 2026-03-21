@@ -9,8 +9,8 @@
 import * as THREE from "three";
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
-import { updateAvatarPose,info_Arm_Right, info_Arm_Left, setInfoArmRight, setInfoArmLeft} from './kinematics.js';
-import { openPlotsPanel, updatePlotlyTimeLine, isAnalogPlotsOpen, closePlotsPanel, createAnalogPlots, updateVectorPlotLine } from './plots.js';
+import { updateAvatarPose, setInfoArmRight, setInfoArmLeft} from './kinematics.js';
+import { openPlotsPanel, updatePlotlyTimeLine, isAnalogPlotsOpen, closePlotsPanel, createAnalogPlots, updateVectorPlotLine, setAnalogPlotsVisibility } from './plots.js';
 import { TRANSLATIONS, t, updateToggleText, updateTextContent, updateTitle, updateThemeButtons, updatePlotsTranslations } from './i18n.js';
 import { MARKER_CATEGORIES, CONECTIONS, MARKERS_COLOURS, HAND_MARKERS_SET, HEAD_MARKERS, ANALOG_COLOURS} from './constants.js';
 import { toggleTrajectory, clearAllTrajectories, trajectories, updateTrajectoriesPanel, initTrajectoryRangeControls, setupTrajectoryRangeControls} from './trajectories.js';
@@ -89,6 +89,8 @@ const analogContent = document.getElementById('analog-content');
 const vectorsToggle = document.getElementById('vectors-toggle');
 const vectorsPanel = document.getElementById('vectors-panel');
 const resetRangeBtn = document.getElementById('reset-trajectory-range');
+const btnResetView = document.getElementById('btn-reset-view');
+const plotsButton = document.createElement('button');
 
 
 // ============================================================================================================================================
@@ -305,12 +307,16 @@ async function handleFileUpload(file) {
 
         //Parse the JSON containing frames, analog data, and metadata
         const data = await response.json();
-        if (!data.frames || data.frames.length === 0) throw new Error("No frames data");
-        
+        if (!data.frames || data.frames.length === 0 && !data.has_analog_data) throw new Error("The c3d file was processed but contains neither valid frames nor analog data.");
         lastLoadedData = data; 
         originalFPS = data.original_fps || 100;
         
-        setStatus(t('app.success', { frames: data.frames.length, fps: originalFPS }), 'success');
+
+        if (!data.frames || data.frames.length === 0) {
+            setStatus(t('app.success_analog_only'), 'success'); 
+        } else {
+            setStatus(t('app.success', { frames: data.frames.length, fps: originalFPS }), 'success');
+        }
         setupSceneFromData(data); 
 
     } catch (error) {
@@ -326,73 +332,87 @@ async function handleFileUpload(file) {
  * @param {Object} data - The parsed JSON data from the C3D file.
  */
 function setupSceneFromData(data) {
-    animationData = data.frames;
+    animationData = data.frames|| [];
     const { geometries } = scene.userData;
 
     // Collect all unique marker names across all frames (at first it was assumed that all frames have the same markers, but this ensures we capture any variations, its common to find markers in posterior frames and not in the first ones)
-    const allMarkerNames = new Set();
-    animationData.forEach(frame => {
-        Object.keys(frame).forEach(key => allMarkerNames.add(key));
-    });
+    
+    if (animationData.length > 0) {
+        const allMarkerNames = new Set();
+        animationData.forEach(frame => {
+            Object.keys(frame).forEach(key => allMarkerNames.add(key));
+        });
+    
 
-    // For every detected marker, create a sphere mesh and add it to the scene
-    allMarkerNames.forEach(name => {
-        const material = getMaterialForMarker(name);
-        const sphere = new THREE.Mesh(geometries.marker, material);
-        
-        sphere.position.set(0, 0, 0);
-        sphere.visible = false; 
+        // For every detected marker, create a sphere mesh and add it to the scene
+        allMarkerNames.forEach(name => {
+            const material = getMaterialForMarker(name);
+            const sphere = new THREE.Mesh(geometries.marker, material);
+            
+            sphere.position.set(0, 0, 0);
+            sphere.visible = false; 
 
-        // Scale down markers for fingers to avoid visual clutter
-        if (HAND_MARKERS_SET.has(name)) {
-            sphere.scale.set(0.6, 0.6, 0.6); 
-        }
+            // Scale down markers for fingers to avoid visual clutter
+            if (HAND_MARKERS_SET.has(name)) {
+                sphere.scale.set(0.6, 0.6, 0.6); 
+            }
 
-        sphere.userData = { 
-            name: name,
-            userVisible: true 
-        };
-        
-        scene.add(sphere);
-        markers[name] = sphere; // Store reference for later updates
-    });
+            sphere.userData = { 
+                name: name,
+                userVisible: true 
+            };
+            
+            scene.add(sphere);
+            markers[name] = sphere; // Store reference for later updates
+        });
 
-    // Add a larger semi-transparent sphere for the head area
-    cabezaMarker = new THREE.Mesh(geometries.head, scene.userData.materials.cabeza);
-    scene.add(cabezaMarker);
+        // Add a larger semi-transparent sphere for the head area
+        cabezaMarker = new THREE.Mesh(geometries.head, scene.userData.materials.cabeza);
+        scene.add(cabezaMarker);
 
-    // Create lines between markers based on the CONNECTIONS map
-    CONECTIONS.forEach(([m1, m2]) => {
-        if (markers[m1] && markers[m2]) {
-            const geometry = new THREE.BufferGeometry();
-            const positions = new Float32Array(6); // 2 points * 3 coordinates (x,y,z)
-            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-            const line = new THREE.Line(geometry, scene.userData.materials.line);
-            line.userData = { m1: markers[m1], m2: markers[m2] };
-            scene.add(line);
-            lines.push(line);
-        }
-    });
+        // Create lines between markers based on the CONNECTIONS map
+        CONECTIONS.forEach(([m1, m2]) => {
+            if (markers[m1] && markers[m2]) {
+                const geometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(6); // 2 points * 3 coordinates (x,y,z)
+                geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const line = new THREE.Line(geometry, scene.userData.materials.line);
+                line.userData = { m1: markers[m1], m2: markers[m2] };
+                scene.add(line);
+                lines.push(line);
+            }
+        });
+        createMarkersPanel();
+    }
 
-    // UI
-    createMarkersPanel();
     createMetadataPanel(data);
     
-    if (data.analog_data) createAnalogPanel(data.analog_data);
+    if (data.analog_data){
+       createAnalogPanel(data.analog_data); 
+       if (animationData.length === 0) {
+            analogPanel.style.display = 'block';
+            updateToggleText(analogToggle, 'ui.analog', analogPanel);
+        }
+    } 
     else if (analogContent) analogContent.innerHTML = `<div class="no-analog-data">${t('analog.no_data')}</div>`;
 
     createVectorsPanel();
     setupTrajectoryRangeControls();
 
     // Playback Initialization
-    isPlaying = true; 
-    if (btnPlayPause) btnPlayPause.textContent = '⏸'; 
-    if (controlsContainer) controlsContainer.style.display = 'flex'; 
-    if (frameSlider) { frameSlider.max = animationData.length - 1; frameSlider.disabled = false; }
-    
-    updateFPSDisplays();
-    updateFrameButtons();
-    updateSceneToFrame(0); // Display the first frame immediately
+    if (animationData.length > 1) {
+        isPlaying = true; 
+        if (btnPlayPause) btnPlayPause.textContent = '⏸'; 
+        if (controlsContainer) controlsContainer.style.display = 'flex'; 
+        if (frameSlider) { frameSlider.max = animationData.length - 1; frameSlider.disabled = false; }
+        
+        updateFPSDisplays();
+        updateFrameButtons();
+        updateSceneToFrame(0); // Display the first frame immediately
+    } else {
+        isPlaying = false;
+        if (controlsContainer) controlsContainer.style.display = 'none';
+    }
 }
 
 /**
@@ -404,6 +424,10 @@ function clearScene() {
     Object.values(markers).forEach(marker => scene.remove(marker));
     lines.forEach(line => scene.remove(line));
     if (cabezaMarker) { scene.remove(cabezaMarker); cabezaMarker = null; }
+    if (isAnalogPlotsOpen) {
+        closePlotsPanel();
+        setAnalogPlotsVisibility(false)
+    }
     clearAllVectors();
     clearAllTrajectories();
     const rangeStart = document.getElementById('trajectory-range-start');
@@ -440,6 +464,9 @@ function clearScene() {
     updateToggleText(vectorsToggle, 'ui.vectors', vectorsPanel);
 
     updateFrameButtons();
+    camera.position.set(2, 1.5, 2);
+    controls.target.set(0, 1, 0);
+    controls.update();
 }
 
 /**
@@ -739,7 +766,6 @@ function createAnalogPanel(analogData) {
     setupFilterControls();
 
     //Button to open the Plotly-based signal visualization panel
-    const plotsButton = document.createElement('button');
     plotsButton.className = 'plots-btn';
     plotsButton.innerHTML = '📈 ' + t('plots.view'); 
     plotsButton.addEventListener('click', () => {
@@ -1382,21 +1408,20 @@ if (vectorsToggle) vectorsToggle.onclick = () => togglePanel(vectorsPanel);
 
 if (clearTrajectoriesBtn) clearTrajectoriesBtn.addEventListener('click', clearAllTrajectories);
 
-/*document.addEventListener('click', (e) => {
-    const isPanel = e.target.closest('#markers-panel, #trajectories-panel, #analog-panel, #metadata-panel, #vectors-panel');
-    const isBtn = e.target.closest('.panel-toggle, .trajectories-toggle, .analog-toggle, .metadata-toggle, .vectors-toggle');
-    const isLang = e.target.closest('.language-selector');
-    
-    if (!isPanel && !isBtn && !isLang) {
-        [markersPanel, trajectoriesPanel, analogPanel, metadataPanel, vectorsPanel].forEach(p => { if(p) p.style.display = 'none'; });
-        updateToggleText(panelToggle, 'ui.markers', markersPanel);
-        updateToggleText(trajectoriesToggle, 'ui.trajectories', trajectoriesPanel);
-        updateToggleText(analogToggle, 'ui.analog', analogPanel);
-        updateToggleText(metadataToggle, 'ui.metadata', metadataPanel);
-        updateToggleText(vectorsToggle, 'ui.vectors', vectorsPanel);
-        setVectorPanelState(false);
-    }
-});*/
+if (btnResetView) {
+    btnResetView.addEventListener('click', () => {
+        camera.position.set(2, 1.5, 2);
+        controls.target.set(0, 1, 0);
+        controls.update();  
+        console.log("Vista de cámara reseteada");
+    });
+}
+
+plotsButton.addEventListener('click', () => {
+    analogPanel.style.display = 'none';
+    updateToggleText(analogToggle, 'ui.analog', analogPanel);
+    openPlotsPanel(analogData, () => lastLoadedData);
+});
 
 
 // Event Listeners for uploading c3d files via Drag & Drop or File Input    

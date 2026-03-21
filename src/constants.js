@@ -1,10 +1,10 @@
 export const MARKER_CATEGORIES = {
-    'torso': { translationKey: 'torso', markers: ['C7', 'T10', 'CLAV', 'STRN', 'SACR'], color: 0xff6b6b, visible: true },
+    'torso': { translationKey: 'torso', markers: ['C7', 'T10', 'CLAV', 'STRN', 'SACR', 'RBAK', 'ROFF'], color: 0xff6b6b, visible: true },
     'pelvis': { translationKey: 'pelvis', markers: ['RPSI', 'RASI', 'LPSI', 'LASI'], color: 0x4ecdc4, visible: true },
     'brazo_derecho': { translationKey: 'brazo_derecho', markers: ['RSHO', 'RUPA', 'RELB', 'RFRM', 'RWRB', 'RWRA', 'RWRT'], color: 0x45aaf2, visible: true },
     'brazo_izquierdo': { translationKey: 'brazo_izquierdo', markers: ['LSHO', 'LUPA', 'LELB', 'LFRM', 'LWRB', 'LWRA', 'LWRT'], color: 0x26de81, visible: true },
     'mano_derecha': { translationKey: 'mano_derecha', markers: ['RTMC','RTPX','RTDI','RTTP','RIMC','RFIN','RIIM','RITP','RMMC','RMPX','RMIM','RMTP','RRMC','RRPX','RRIM','RRTP','RLMC','RLPX','RLIM','RLTP','RPLM', 'RIDI', 'RLDI', 'RMDI', 'RRDI'], color: 0x32a6a8, visible: true },
-    'mano_izquierda': { translationKey: 'mano_izquierda', markers: ['LTMC','LTPX','LTTP','LIMC','LFIN','LIIM','LITP','LMMC','LMPX','LMIM','LMTP','LRMC','LRPX','LRIM','LRTP','LLMC','LLPX','LLIM','LLTP', 'LPLM','LIDI', 'LLDI', 'LMDI', 'LRDI'], color: 0x32a869, visible: true },
+    'mano_izquierda': { translationKey: 'mano_izquierda', markers: ['LTMC','LTPX','LTDI','LTTP','LIMC','LFIN','LIIM','LITP','LMMC','LMPX','LMIM','LMTP','LRMC','LRPX','LRIM','LRTP','LLMC','LLPX','LLIM','LLTP', 'LPLM','LIDI', 'LLDI', 'LMDI', 'LRDI'], color: 0x32a869, visible: true },
     'pierna_derecha': { translationKey: 'pierna_derecha', markers: ['RTHI', 'RKNE', 'RSHN', 'RANK', 'RHEE', 'RTOE', 'RMT5'], color: 0xa55eea, visible: true },
     'pierna_izquierda': { translationKey: 'pierna_izquierda', markers: ['LTHI', 'LKNE', 'LSHN', 'LANK', 'LHEE', 'LTOE', 'LMT5'], color: 0xf7b731, visible: true },
     'cabeza': { translationKey: 'cabeza', markers: ['RBHD', 'LBHD', 'LFHD', 'RFHD', 'HEAD'], color: 0xfd9644, visible: true },
@@ -13,7 +13,7 @@ export const MARKER_CATEGORIES = {
 
 export const ANALOG_COLOURS = {
     'emg': 0xff6b6b, 'fuerza': 0xfd9644, 'momento': 0x45aaf2,
-    'acelerometro': 0x26de81, 'giroscopio': 0xa55eea, 'angulo': 0xf7b731, 'desconocido': 0x888888
+    'acelerometro': 0x26de81, 'giroscopio': 0xa55eea, 'angulo': 0xf7b731, 'potencia': 0x32a6a8, 'desconocido': 0x888888
 };
 
 export const CONECTIONS = [
@@ -56,7 +56,7 @@ export const CONECTIONS = [
 ];
 
 export const MARKERS_COLOURS = {
-    'C7': 0xff0000, 'T10': 0xff5500, 'CLAV': 0xffff00, 'STRN': 0xff00ff, 'SACR': 0x00ffff,
+    'C7': 0xff0000, 'T10': 0xff5500, 'CLAV': 0xffff00, 'STRN': 0xff00ff, 'SACR': 0x00ffff, 'RBAK':0x00ffff, 'ROFF':0x00ffff,
     'RPSI': 0x0000ff, 'RASI': 0x0000ff, 'LPSI': 0x00ff00, 'LASI': 0x00ff00,
     'RSHO': 0x45aaf2, 'RUPA': 0x45aaf2, 'RELB': 0x45aaf2, 'RFRM': 0x45aaf2, 'RWRB': 0x45aaf2, 'RWRA': 0x45aaf2, 'RWRT': 0x45aaf2,
     'LSHO': 0x26de81, 'LUPA': 0x26de81, 'LELB': 0x26de81, 'LFRM': 0x26de81, 'LWRB': 0x26de81, 'LWRA': 0x26de81, 'LWRT': 0x26de81,

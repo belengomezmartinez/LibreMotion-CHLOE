@@ -177,6 +177,9 @@ function clearPlots() {
     if (gs) gs.innerHTML = '';
 }
 
+export function setAnalogPlotsVisibility(visible) {
+    isAnalogPlotsOpen = visible;
+}
 
 //==============================================================================
 // Public functions (ANAL0G PLOTS, called from main.js and animation loop)

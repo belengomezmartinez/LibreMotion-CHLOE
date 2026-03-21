@@ -7,6 +7,7 @@ export const TRANSLATIONS = {
             select_file: "Seleccionar Archivo .c3d",
             processing: "Procesando archivo C3D...",
             success: "Archivo procesado! {{frames}} frames @ {{fps}}Hz",
+            success_analog_only: "Archivo procesado! No se encontraron frames, pero sí datos analógicos.",
             error: "Error: {{message}}",
             select_file_prompt: "Selecciona un archivo .c3d para comenzar"
         },
@@ -63,6 +64,7 @@ export const TRANSLATIONS = {
             acelerometro: "Acelerómetro",
             giroscopio: "Giroscopio",
             angulo: "Ángulo",
+            potencia: "Potencia",
             desconocido: "Desconocido",
             todos: "Todos"
         },
@@ -93,12 +95,13 @@ export const TRANSLATIONS = {
         ui: {
             markers: "📋 Marcadores",
             close: "✕ Cerrar",
-            trajectories: "🔄 Trayectorias",
+            trajectories: "📐 Trayectorias",
             analog: "📊 Datos Analógicos",
             metadata: "📈 Metadatos", 
             view_avatar: "👤 Ver Avatar",
             view_lines: "🕸 Ver Esqueleto", 
-            vectors: "📏 Vectores"
+            vectors: "📏 Vectores", 
+            reset_view: "🔄 Reiniciar Vista"
         },
         plots: {
             title: "Gráficas Analógicas",
@@ -129,6 +132,7 @@ export const TRANSLATIONS = {
             select_file: "Select .c3d File",
             processing: "Processing C3D file...",
             success: "File processed! {{frames}} frames @ {{fps}}Hz",
+            success_analog_only: "File processed! No frames found, but analog data is available.",
             error: "Error: {{message}}",
             select_file_prompt: "Select a .c3d file to start"
         },
@@ -185,6 +189,7 @@ export const TRANSLATIONS = {
             acelerometro: "Accelerometer",
             giroscopio: "Gyroscope",
             angulo: "Angle",
+            potencia: "Power",
             desconocido: "Unknown",
             todos: "All"
         },
@@ -215,12 +220,13 @@ export const TRANSLATIONS = {
         ui: {
             markers: "📋 Markers",
             close: "✕ Close",
-            trajectories: "🔄 Trajectories",
+            trajectories: "📐 Trajectories",
             analog: "📊 Analog Data",
             metadata: "📈 Metadata",
             view_avatar: "👤 View Avatar",
             view_lines: "🕸 View Rig",
-            vectors: "📏 Vectors"
+            vectors: "📏 Vectors",
+            reset_view: "🔄 Reset View"
         },
         plots: {
             title: "Analog Plots",
@@ -251,6 +257,7 @@ export const TRANSLATIONS = {
             select_file: "Sélectionner un fichier .c3d",
             processing: "Traitement du fichier C3D...",
             success: "Fichier traité ! {{frames}} trames @ {{fps}}Hz",
+            success_analog_only: "Fichier traité ! Aucune trame trouvée, mais des données analogiques sont disponibles.",
             error: "Erreur : {{message}}",
             select_file_prompt: "Sélectionnez un fichier .c3d pour commencer"
         },
@@ -307,6 +314,7 @@ export const TRANSLATIONS = {
             acelerometro: "Accéléromètre",
             giroscopio: "Gyroscope",
             angulo: "Angle",
+            potencia: "Puissance",
             desconocido: "Inconnu",
             todos: "Tous"
         },
@@ -337,12 +345,13 @@ export const TRANSLATIONS = {
         ui: {
             markers: "📋 Marqueurs",
             close: "✕ Fermer",
-            trajectories: "🔄 Trajectoires",
+            trajectories: "📐 Trajectoires",
             analog: "📊 Données Analog",
             metadata: "📈 Métadonnées",
             view_avatar: "👤 Voir Avatar",
             view_lines: "🕸 Voir le squelette",
-            vectors: "📏 Vecteurs"
+            vectors: "📏 Vecteurs",
+            reset_view: "🔄 Réinitialiser la vue"
         },
         plots: {
             title: "Graphiques Analogiques",
