@@ -49,7 +49,7 @@ export function addMarkerVector(nameA, nameB){
  * @returns {Object} An object containing arrays of angles (in degrees) for x, y, z axes and corresponding time points.
  */
 
-function calculateVectorAnglesOverTime(nameA, nameB) {
+/*function calculateVectorAnglesOverTime(nameA, nameB) {
     const results = { x: [], y: [], z: [], time: [] };
 
     animationData.forEach((frame, index) => {
@@ -75,6 +75,43 @@ function calculateVectorAnglesOverTime(nameA, nameB) {
         }
         results.time.push(index / originalFPS);
     });
+    return results;
+}*/
+
+function calculateVectorAnglesOverTime(nameA, nameB) {
+    const results = { x: [], y: [], z: [], time: [] };
+
+    animationData.forEach((frame, index) => {
+        const posA = frame[nameA];
+        const posB = frame[nameB];
+
+        if (posA && posB) {
+            const vector = new THREE.Vector3(
+                posB[0] - posA[0],
+                posB[1] - posA[1],
+                posB[2] - posA[2]
+            );
+
+            const length = vector.length();
+
+            if (length > 0.0001) {
+                results.x.push(THREE.MathUtils.radToDeg(Math.atan2(vector.z, vector.y)));
+                results.y.push(THREE.MathUtils.radToDeg(Math.atan2(vector.z, vector.x)));
+                results.z.push(THREE.MathUtils.radToDeg(Math.atan2(vector.y, vector.x)));
+            } else {
+                results.x.push(null);
+                results.y.push(null);
+                results.z.push(null);
+            }
+        } else {
+            results.x.push(null);
+            results.y.push(null);
+            results.z.push(null);
+        }
+
+        results.time.push(index / originalFPS);
+    });
+
     return results;
 }
 
