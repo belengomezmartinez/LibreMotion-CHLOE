@@ -43,6 +43,7 @@ export let avatarBones = {
 export let avatarLoaded = false;
 export let isAvatarMode = false; // true = the avatar is shown, false = the lines are shown
 export let originalFPS = 0;
+export let avatarRestHipHeight = 0;
 
 let camera, renderer, controls, ambientLight;
 let markers = {}; 
@@ -998,10 +999,18 @@ function loadAvatar() {
                 // --- Upper Body Mapping ---
                 if (n.includes("RightArm") || n === "mixamorig1RightArm" || n === "mixamorigRightArm") avatarBones.RightArm = child;
                 if (n.includes("RightForeArm") || n === "mixamorig1RightForeArm"|| n === "mixamorigRightForeArm") avatarBones.RightForeArm = child;
+                //if (n === "mixamorig1RightArm" || n === "mixamorigRightArm" || n === "RightArm") avatarBones.RightArm = child;
+                //if (n === "mixamorig1RightForeArm" || n === "mixamorigRightForeArm" || n === "RightForeArm") avatarBones.RightForeArm = child;
+                console.log("RightArm bone:", avatarBones.RightArm?.name);
+                console.log("RightForeArm bone:", avatarBones.RightForeArm?.name);
                 if (n === "mixamorig1RightHand" || n === "mixamorigRightHand") avatarBones.RightHand = child;
                 
                 if (n.includes("LeftArm") || n === "mixamorig1LeftArm"|| n === "mixamorigLeftArm") avatarBones.LeftArm = child;
                 if (n.includes("LeftForeArm") || n === "mixamorig1LeftForeArm"|| n === "mixamorigLeftForeArm") avatarBones.LeftForeArm = child;
+                //if (n === "mixamorig1LeftArm" || n === "mixamorigLeftArm" || n === "LeftArm") avatarBones.LeftArm = child;
+                //if (n === "mixamorig1LeftForeArm" || n === "mixamorigLeftForeArm" || n === "LeftForeArm") avatarBones.LeftForeArm = child;
+                console.log("LeftArm bone:", avatarBones.LeftArm?.name);
+                console.log("LeftForeArm bone:", avatarBones.LeftForeArm?.name);
                 if (n === "mixamorig1LeftHand"||n === "mixamorigLeftHand") avatarBones.LeftHand = child;
                 
                 // --- Head & Spine Mapping ---
@@ -1027,6 +1036,13 @@ function loadAvatar() {
         });
 
         scene.add(avatar);
+        avatar.updateWorldMatrix(true, true);
+        if (avatarBones.Hips) {
+            const hipPos = new THREE.Vector3();
+            avatarBones.Hips.getWorldPosition(hipPos);
+            avatarRestHipHeight = hipPos.y;
+            //console.log(`avatarRestHipHeight = ${avatarRestHipHeight}m`);
+        }
         avatar.visible = isAvatarMode;
         avatarLoaded = true;
         console.log("Avatar cargado y huesos detectados:", avatarBones);

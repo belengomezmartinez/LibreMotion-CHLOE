@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { avatar, avatarBones, avatarLoaded } from './main.js';
+import { avatar, avatarBones, avatarLoaded,  avatarRestHipHeight } from './main.js';
 import { FINGER_MARKERS } from "./constants.js";
 
 export let info_Arm_Right = false;
@@ -78,7 +78,7 @@ export function updateAvatarPose(frameData) {
         //avatar.position.y = finalRootPos.y - 0.85;
 
         // Grounding Logic: Find the lowest foot marker to prevent floating
-        const footMarkers = ['LHEE', 'LTOE', 'LMT5', 'RHEE', 'RTOE', 'RMT5', 'LANK', 'RANK'];
+        /*const footMarkers = ['LHEE', 'LTOE', 'LMT5', 'RHEE', 'RTOE', 'RMT5', 'LANK', 'RANK'];
         let lowestY = Infinity;
         
         footMarkers.forEach(name => {
@@ -96,7 +96,8 @@ export function updateAvatarPose(frameData) {
             // estimate a leg large of 0.85m
             avatar.position.y = finalRootPos.y - 0.85; 
             console.log(`Estimando posición del avatar a nivel del suelo con altura de 0.85m`);
-        }
+        }*/
+       avatar.position.y = finalRootPos.y - avatarRestHipHeight;
     }
 
     // --- GLOBAL ROTATION ---
@@ -180,6 +181,8 @@ export function updateAvatarPose(frameData) {
         const frontMidpoint = new THREE.Vector3().addVectors(rfhd, lfhd).multiplyScalar(0.5);
         const backMidpoint = new THREE.Vector3().addVectors(rbhd, lbhd).multiplyScalar(0.5);
         const lookDir = new THREE.Vector3().subVectors(frontMidpoint, backMidpoint).normalize();
+        lookDir.y = Math.max(-0.3, Math.min(0.3, lookDir.y)); 
+        lookDir.normalize();
         
         // Project a target point in front of the head to apply the lookAt transformation
         const headPos = new THREE.Vector3();
@@ -199,13 +202,16 @@ export function updateAvatarPose(frameData) {
 
     let wristRTarget = null;
     if (rWRA && rWRB) wristRTarget = new THREE.Vector3().addVectors(rWRA, rWRB).multiplyScalar(0.5);
-    else wristRTarget = rWRA || rWRB || rWRT;
+    else wristRTarget = rWRT || rWRA || rWRB;
     
     if (rShoulder && rElbow && avatarBones.RightArm){
         info_Arm_Right = true;
         alignBone(avatarBones.RightArm, rShoulder, rElbow);
     } 
-    if (rElbow && wristRTarget && avatarBones.RightForeArm) alignBone(avatarBones.RightForeArm, rElbow, RForeArm || wristRTarget);
+    //if (rElbow && wristRTarget && avatarBones.RightForeArm) alignBone(avatarBones.RightForeArm, rElbow, RForeArm || wristRTarget);
+    const rForeArmTarget = RForeArm || wristRTarget;
+    if (rElbow && rForeArmTarget && avatarBones.RightForeArm)
+        alignBone(avatarBones.RightForeArm, rElbow, rForeArmTarget);
     if (wristRTarget && rHand && avatarBones.RightHand) alignBone(avatarBones.RightHand, wristRTarget, rHand); 
     
     updateHandFingers('Right', frameData);
@@ -226,7 +232,10 @@ export function updateAvatarPose(frameData) {
         info_Arm_Left = true;
         alignBone(avatarBones.LeftArm, lShoulder, lElbow);
     } 
-    if (lElbow && wristLTarget && avatarBones.LeftForeArm) alignBone(avatarBones.LeftForeArm, lElbow, lForeArm || wristLTarget);
+    //if (lElbow && wristLTarget && avatarBones.LeftForeArm) alignBone(avatarBones.LeftForeArm, lElbow, lForeArm || wristLTarget);
+    const lForeArmTarget = lForeArm || wristLTarget;
+    if (lElbow && lForeArmTarget && avatarBones.LeftForeArm)
+        alignBone(avatarBones.LeftForeArm, lElbow, lForeArmTarget);
     if (wristLTarget && lHand && avatarBones.LeftHand) alignBone(avatarBones.LeftHand, wristLTarget, lHand); 
     
     updateHandFingers('Left', frameData);
