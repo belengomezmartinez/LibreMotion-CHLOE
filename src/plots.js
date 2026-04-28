@@ -311,16 +311,16 @@ export function createVectorPlots(id) {
         import('./vectors.js').then(m => m.removeVector(vectorId));
     });
 
-    /*const traces = [
+    const traces = [
         { x: vec.angleData.time, y: vec.angleData.x, name: 'Ang X', line: {color: 'red'} },
         { x: vec.angleData.time, y: vec.angleData.y, name: 'Ang Y', line: {color: 'green'} },
         { x: vec.angleData.time, y: vec.angleData.z, name: 'Ang Z', line: {color: 'blue'} }
-    ];*/
-    const traces = [
+    ];
+    /*const traces = [
         { x: vec.angleData.time, y: breakAtWrapJumps(vec.angleData.x), name: 'Ang X', line: {color: 'red'} },
         { x: vec.angleData.time, y: breakAtWrapJumps(vec.angleData.y), name: 'Ang Y', line: {color: 'green'} },
         { x: vec.angleData.time, y: breakAtWrapJumps(vec.angleData.z), name: 'Ang Z', line: {color: 'blue'} }
-    ];
+    ];*/
 
     const layout = {
         height: 300,

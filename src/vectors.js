@@ -42,41 +42,27 @@ export function addMarkerVector(nameA, nameB){
     createVectorPlots(id);
 }
 
+// LO QUE HACE QUE SE VEA MOVIENDO LA GRÁFICA
+// Helper function to unwrap angles to prevent discontinuities in plots (e.g., from 359° to 0°)
+function unwrapAngles(angles) {
+    const unwrapped = [...angles];
+    let offset = 0; // track accumulated correction
+    for (let i = 1; i < unwrapped.length; i++) {
+        if (unwrapped[i] === null || unwrapped[i - 1] === null) continue;
+        let diff = (unwrapped[i] + offset) - unwrapped[i - 1];
+        if (diff > 180)  offset -= 360;
+        if (diff < -180) offset += 360;
+        unwrapped[i] += offset;
+    }
+    return unwrapped;
+}
+
 /** 
  * Calculates the angles of the vector defined by two markers relative to the global axes for each frame.
  * @param {string} nameA - The name of the first marker.
  * @param {string} nameB - The name of the second marker.
  * @returns {Object} An object containing arrays of angles (in degrees) for x, y, z axes and corresponding time points.
  */
-
-/*function calculateVectorAnglesOverTime(nameA, nameB) {
-    const results = { x: [], y: [], z: [], time: [] };
-
-    animationData.forEach((frame, index) => {
-        const posA = frame[nameA];
-        const posB = frame[nameB];
-        if (posA && posB) {
-            const vector = new THREE.Vector3(posB[0] - posA[0], posB[1] - posA[1], posB[2] - posA[2]);
-            const length = vector.length();
-            // Calculate angles in degrees (.radToDeg) relative to the global axes
-            if(length > 0.0001) {
-                results.x.push(THREE.MathUtils.radToDeg(Math.acos(vector.x / length)));
-                results.y.push(THREE.MathUtils.radToDeg(Math.acos(vector.y / length)));
-                results.z.push(THREE.MathUtils.radToDeg(Math.acos(vector.z / length)));
-            } else {
-                results.x.push(null);
-                results.y.push(null);
-                results.z.push(null);
-            }
-        } else {
-            results.x.push(null);
-            results.y.push(null);
-            results.z.push(null);
-        }
-        results.time.push(index / originalFPS);
-    });
-    return results;
-}*/
 
 function calculateVectorAnglesOverTime(nameA, nameB) {
     const results = { x: [], y: [], z: [], time: [] };
@@ -111,6 +97,9 @@ function calculateVectorAnglesOverTime(nameA, nameB) {
 
         results.time.push(index / originalFPS);
     });
+    results.x = unwrapAngles(results.x);
+    results.y = unwrapAngles(results.y);
+    results.z = unwrapAngles(results.z);
 
     return results;
 }
