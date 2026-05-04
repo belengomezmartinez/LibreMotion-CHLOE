@@ -11,7 +11,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { FBXLoader } from 'three/addons/loaders/FBXLoader.js';
 import { updateAvatarPose, setInfoArmRight, setInfoArmLeft} from './kinematics.js';
 import { openPlotsPanel, updatePlotlyTimeLine, isAnalogPlotsOpen, closePlotsPanel, createAnalogPlots, updateVectorPlotLine, setAnalogPlotsVisibility } from './plots.js';
-import { TRANSLATIONS, t, updateToggleText, updateTextContent, updateTitle, updateThemeButtons, updatePlotsTranslations } from './i18n.js';
+import { TRANSLATIONS, t, updateToggleText, updateTextContent, updateTitle, updateThemeButtons, updatePlotsTranslations, getMarkerAnatomicalName } from './i18n.js';
 import { MARKER_CATEGORIES, CONECTIONS, MARKERS_COLOURS, HAND_MARKERS_SET, HEAD_MARKERS, ANALOG_COLOURS} from './constants.js';
 import { toggleTrajectory, clearAllTrajectories, trajectories, updateTrajectoriesPanel, initTrajectoryRangeControls, setupTrajectoryRangeControls} from './trajectories.js';
 import { addMarkerVector, updateVectors3D, isVectorPanelOpen, setVectorPanelState, clearAllVectors, activeVectors} from './vectors.js';
@@ -553,16 +553,19 @@ function createMarkersPanel() {
             const isStandard = isMarkerStandardized(markerName);
             const markerColor = MARKERS_COLOURS[markerName] || category.color;
             const hasTrajectory = trajectories[markerName] !== undefined;
+
+            const anatomicalName = getMarkerAnatomicalName(markerName);
+            const displayName = anatomicalName !== markerName ? `${anatomicalName} (${markerName})` : markerName;
             
             markerItem.innerHTML = `
-                <div class="marker-checkbox ${category.visible ? 'checked' : ''}" data-marker="${markerName}"></div>
-                <div class="marker-color" style="background-color: #${markerColor.toString(16).padStart(6, '0')}"></div>
-                <span class="marker-name">${markerName}${!isStandard ? '<span class="non-standard-badge">*</span>' : ''}</span>
-                <button class="marker-trajectory-btn ${hasTrajectory ? 'active' : ''}" 
-                        data-marker="${markerName}" 
-                        title="${hasTrajectory ? t('trajectories.hide') : t('trajectories.show')}">
-                    ${hasTrajectory ? '📈' : '📉'}
-                </button>
+                    <div class="marker-checkbox ${category.visible ? 'checked' : ''}" data-marker="${markerName}"></div>
+                    <div class="marker-color" style="background-color: #${markerColor.toString(16).padStart(6, '0')}"></div>
+                    <span class="marker-name">${displayName}${!isStandard ? '<span class="non-standard-badge">*</span>' : ''}</span>
+                    <button class="marker-trajectory-btn ${hasTrajectory ? 'active' : ''}" 
+                            data-marker="${markerName}" 
+                            title="${hasTrajectory ? t('trajectories.hide') : t('trajectories.show')}">
+                        ${hasTrajectory ? '📈' : '📉'}
+                    </button>
             `;
             
             if (!isStandard) markerItem.title = t('markers.non_standard');
@@ -787,12 +790,20 @@ function createVectorsPanel() {
         <div class="vector-selector-group">
             <label>${t('vectors.select_start')}:</label>
             <select id="vec-start" class="vector-select">
-                ${markerNames.map(m => `<option value="${m}">${m}</option>`).join('')}
+                ${markerNames.map(m => {
+                    const anatomicalName = getMarkerAnatomicalName(m);
+                    const displayText = anatomicalName !== m ? `${anatomicalName} (${m})` : m;
+                    return `<option value="${m}">${displayText}</option>`;
+                }).join('')}
             </select>
             
             <label>${t('vectors.select_end')}:</label>
             <select id="vec-end" class="vector-select">
-                ${markerNames.map(m => `<option value="${m}">${m}</option>`).join('')}
+                ${markerNames.map(m => {
+                    const anatomicalName = getMarkerAnatomicalName(m);
+                    const displayText = anatomicalName !== m ? `${anatomicalName} (${m})` : m;
+                    return `<option value="${m}">${displayText}</option>`;
+                }).join('')}
             </select>
             
             <button id="btn-add-vector" class="primary-btn">${t('vectors.add')}</button>
@@ -812,14 +823,6 @@ function createVectorsPanel() {
             }
         };
     }
-    
-        /*const labels = panel.querySelectorAll('.vector-selector-group label');
-        if (labels.length >= 2) {
-            labels[0].textContent = `${t('vectors.select_start')}:`;
-            labels[1].textContent = `${t('vectors.select_end')}:`;
-        }
-        const btnAdd = document.getElementById('btn-add-vector');
-        if (btnAdd) btnAdd.textContent = t('vectors.add');*/
 
     Object.keys(activeVectors).forEach(id => {
         const graphDiv = document.getElementById(`plot-${id}`);

@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { t } from './i18n.js';
+import { t, getMarkerAnatomicalName } from './i18n.js';
 import { scene, animationData, trajectoriesList } from './main.js';
 
 export let trajectories = {};
@@ -243,10 +243,13 @@ export function updateTrajectoriesPanel() {
         item.className = 'trajectory-item';
         item.style.borderLeftColor = `#${trajectory.color.toString(16).padStart(6, '0')}`;
         
+        const anatomicalName = getMarkerAnatomicalName(markerName);
+        const displayName = anatomicalName !== markerName ? `${anatomicalName} (${markerName})` : markerName;
+
         item.innerHTML = `
             <div class="trajectory-info">
                 <div class="trajectory-color" style="background-color: #${trajectory.color.toString(16).padStart(6, '0')}"></div>
-                <span class="trajectory-name">${markerName}</span>
+                <span class="trajectory-name">${displayName}</span>
             </div>
             <div class="trajectory-actions">
                 <button class="trajectory-btn remove" data-marker="${markerName}" title="${t('trajectories.remove')}">✕</button>
