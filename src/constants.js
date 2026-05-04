@@ -1,5 +1,6 @@
+// Used in main.js for marker grouping and coloring in the UI
 export const MARKER_CATEGORIES = {
-    'torso': { translationKey: 'torso', markers: ['C7', 'T10', 'CLAV', 'STRN', 'SACR', 'RBAK', 'ROFF'], color: 0xff6b6b, visible: true },
+    'torso': { translationKey: 'torso', markers: ['C7', 'T10', 'CLAV', 'STRN', 'SACR', 'RBAK'], color: 0xff6b6b, visible: true },
     'pelvis': { translationKey: 'pelvis', markers: ['RPSI', 'RASI', 'LPSI', 'LASI'], color: 0x4ecdc4, visible: true },
     'brazo_derecho': { translationKey: 'brazo_derecho', markers: ['RSHO', 'RUPA', 'RELB', 'RFRM', 'RWRB', 'RWRA', 'RWRT'], color: 0x45aaf2, visible: true },
     'brazo_izquierdo': { translationKey: 'brazo_izquierdo', markers: ['LSHO', 'LUPA', 'LELB', 'LFRM', 'LWRB', 'LWRA', 'LWRT'], color: 0x26de81, visible: true },
@@ -11,11 +12,13 @@ export const MARKER_CATEGORIES = {
     'otros': { translationKey: 'otros', markers: [], color: 0x888888, visible: true }
 };
 
+// Used in main.js for analog data coloring when a type is changed by the user in the UI
 export const ANALOG_COLOURS = {
     'emg': 0xff6b6b, 'fuerza': 0xfd9644, 'momento': 0x45aaf2,
     'acelerometro': 0x26de81, 'giroscopio': 0xa55eea, 'angulo': 0xf7b731, 'potencia': 0x32a6a8, 'desconocido': 0x888888
 };
 
+// Used in main.js for marker connections
 export const CONECTIONS = [
     ['C7', 'CLAV'], ['CLAV', 'STRN'], ['STRN', 'T10'], ['C7', 'T10'], ['T10', 'SACR'], 
     ['CLAV', 'RASI'], ['CLAV', 'LASI'], ['C7', 'RPSI'], ['C7', 'LPSI'],
@@ -55,8 +58,9 @@ export const CONECTIONS = [
 
 ];
 
+// Used in main.js for marker coloring 
 export const MARKERS_COLOURS = {
-    'C7': 0xff0000, 'T10': 0xff5500, 'CLAV': 0xffff00, 'STRN': 0xff00ff, 'SACR': 0x00ffff, 'RBAK':0x00ffff, 'ROFF':0x00ffff,
+    'C7': 0xff0000, 'T10': 0xff5500, 'CLAV': 0xffff00, 'STRN': 0xff00ff, 'SACR': 0x00ffff, 'RBAK':0x00ffff,
     'RPSI': 0x0000ff, 'RASI': 0x0000ff, 'LPSI': 0x00ff00, 'LASI': 0x00ff00,
     'RSHO': 0x45aaf2, 'RUPA': 0x45aaf2, 'RELB': 0x45aaf2, 'RFRM': 0x45aaf2, 'RWRB': 0x45aaf2, 'RWRA': 0x45aaf2, 'RWRT': 0x45aaf2,
     'LSHO': 0x26de81, 'LUPA': 0x26de81, 'LELB': 0x26de81, 'LFRM': 0x26de81, 'LWRB': 0x26de81, 'LWRA': 0x26de81, 'LWRT': 0x26de81,
@@ -73,6 +77,7 @@ export const MARKERS_COLOURS = {
     'LIDI':0x32a869, 'LLDI':0x32a869, 'LMDI':0x32a869 , 'LRDI': 0x32a869
 };
 
+// Used in main.js for head marker identification
 export const HEAD_MARKERS = ['RBHD', 'LBHD', 'LFHD', 'RFHD'];
 
 // Used in kinematics.js for bone-to-bone alignment
@@ -95,15 +100,13 @@ export const FINGER_MARKERS = {
 
 // Used in main.js for marker identification and UI scaling
 export const HAND_MARKERS_SET = new Set([
-    // --- Mano Derecha ---
-    'RTMC', 'RTPX', 'RTDI', 'RTTP', // Pulgar
-    'RIMC', 'RFIN', 'RIIM', 'RITP', 'RIDI', // Índice
-    'RMMC', 'RMPX', 'RMIM', 'RMTP', 'RMDI',// Medio
-    'RRMC', 'RRPX', 'RRIM', 'RRTP', 'RRDI',// Anular
-    'RLMC', 'RLPX', 'RLIM', 'RLTP', 'RLDI',// Meñique
-    'RPLM', // Palma
+    'RTMC', 'RTPX', 'RTDI', 'RTTP', 
+    'RIMC', 'RFIN', 'RIIM', 'RITP', 'RIDI', 
+    'RMMC', 'RMPX', 'RMIM', 'RMTP', 'RMDI',
+    'RRMC', 'RRPX', 'RRIM', 'RRTP', 'RRDI',
+    'RLMC', 'RLPX', 'RLIM', 'RLTP', 'RLDI',
+    'RPLM', 
     
-    // --- Mano Izquierda ---
     'LTMC', 'LTPX', 'LTDI', 'LTTP', 
     'LIMC', 'LFIN', 'LIIM', 'LITP', 'LIDI',
     'LMMC', 'LMPX', 'LMIM', 'LMTP', 'LMDI',

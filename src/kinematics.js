@@ -180,21 +180,31 @@ export function updateAvatarPose(frameData) {
         // Calculate the face direction vector (Back-to-Front)
         const frontMidpoint = new THREE.Vector3().addVectors(rfhd, lfhd).multiplyScalar(0.5);
         const backMidpoint = new THREE.Vector3().addVectors(rbhd, lbhd).multiplyScalar(0.5);
+
         const lookDir = new THREE.Vector3().subVectors(frontMidpoint, backMidpoint).normalize();
-        lookDir.y = Math.max(-0.3, Math.min(0.3, lookDir.y)); 
+        lookDir.y = Math.max(-0.5, Math.min(0.5, lookDir.y)); 
         lookDir.normalize();
-        
-        // Project a target point in front of the head to apply the lookAt transformation
+
+        const rightMid = new THREE.Vector3().addVectors(rfhd, rbhd).multiplyScalar(0.5);
+        const leftMid  = new THREE.Vector3().addVectors(lfhd, lbhd).multiplyScalar(0.5);
+        const lateralVec = new THREE.Vector3().subVectors(rightMid, leftMid).normalize();
+
+        const upVec = new THREE.Vector3().crossVectors(lateralVec, lookDir).normalize();
+
         const headPos = new THREE.Vector3();
         avatarBones.Head.getWorldPosition(headPos);
-        const lookTarget = new THREE.Vector3().addVectors(headPos, lookDir); 
+        const lookTarget = new THREE.Vector3().addVectors(headPos, lookDir);
+        
+        avatarBones.Head.up.copy(upVec);
         avatarBones.Head.lookAt(lookTarget);
+        avatarBones.Head.up.set(0, 1, 0); 
     }
 
     // --- Upper Limbs ---
     const rShoulder = getVectorFromMarker(frameData, 'RSHO');
+    const rUpperArm = getVectorFromMarker(frameData, 'RUPA');
     const rElbow = getVectorFromMarker(frameData, 'RELB');
-    const RForeArm = getVectorFromMarker(frameData, 'RFRM');
+    const rForeArm = getVectorFromMarker(frameData, 'RFRM');
     const rWRT = getVectorFromMarker(frameData, 'RWRT') 
     const rWRA = getVectorFromMarker(frameData, 'RWRA')
     const rWRB = getVectorFromMarker(frameData, 'RWRB');
@@ -208,8 +218,9 @@ export function updateAvatarPose(frameData) {
         info_Arm_Right = true;
         alignBone(avatarBones.RightArm, rShoulder, rElbow);
     } 
-    //if (rElbow && wristRTarget && avatarBones.RightForeArm) alignBone(avatarBones.RightForeArm, rElbow, RForeArm || wristRTarget);
-    const rForeArmTarget = RForeArm || wristRTarget;
+
+    const rForeArmTarget = wristRTarget || rForeArm ;
+    if (rElbow || rUpperArm || rForeArm) info_Arm_Right = true;
     if (rElbow && rForeArmTarget && avatarBones.RightForeArm)
         alignBone(avatarBones.RightForeArm, rElbow, rForeArmTarget);
     if (wristRTarget && rHand && avatarBones.RightHand) alignBone(avatarBones.RightHand, wristRTarget, rHand); 
@@ -217,6 +228,7 @@ export function updateAvatarPose(frameData) {
     updateHandFingers('Right', frameData);
     
     const lShoulder = getVectorFromMarker(frameData, 'LSHO');
+    const lUpperArm = getVectorFromMarker(frameData, 'LUPA');
     const lElbow = getVectorFromMarker(frameData, 'LELB');
     const lForeArm = getVectorFromMarker(frameData, 'LFRM');
     const lWRT = getVectorFromMarker(frameData, 'LWRT') 
@@ -229,11 +241,11 @@ export function updateAvatarPose(frameData) {
     else wristLTarget = lWRT || lWRA || lWRB;
     
     if (lShoulder && lElbow && avatarBones.LeftArm){
-        info_Arm_Left = true;
         alignBone(avatarBones.LeftArm, lShoulder, lElbow);
     } 
-    //if (lElbow && wristLTarget && avatarBones.LeftForeArm) alignBone(avatarBones.LeftForeArm, lElbow, lForeArm || wristLTarget);
-    const lForeArmTarget = lForeArm || wristLTarget;
+
+    const lForeArmTarget = wristLTarget || lForeArm ;
+    if (lElbow || lUpperArm || lForeArm) info_Arm_Left = true;
     if (lElbow && lForeArmTarget && avatarBones.LeftForeArm)
         alignBone(avatarBones.LeftForeArm, lElbow, lForeArmTarget);
     if (wristLTarget && lHand && avatarBones.LeftHand) alignBone(avatarBones.LeftHand, wristLTarget, lHand); 
@@ -302,30 +314,35 @@ export function updateAvatarPose(frameData) {
  * @param {string} side - 'Right' or 'Left'.
  * @param {Object} frameData - Current frame marker coordinates.
  */
-function updateHandFingers(side, frameData) {
+/*function updateHandFingers(side, frameData) {
     let handBone
     let foreArmBone, ArmBone;
     let palmMarkerName;
-    let wristMarkerName;
     let infoArm;
+    let wristR, wristL;
+    
 
     if (side === 'Right') {
         foreArmBone = avatarBones.RightForeArm;
         ArmBone = avatarBones.RightArm;
         handBone = avatarBones.RightHand;
         palmMarkerName = 'RPLM';
-        wristMarkerName = 'RWRT'|| 'RWRA' || 'RWRB';
+        wristR = getVectorFromMarker(frameData, 'RWRT') 
+            || getVectorFromMarker(frameData, 'RWRA') 
+            || getVectorFromMarker(frameData, 'RWRB');
         infoArm = info_Arm_Right;
     } else {
         foreArmBone = avatarBones.LeftForeArm;
         ArmBone = avatarBones.LeftArm;
         handBone = avatarBones.LeftHand;
         palmMarkerName = 'LPLM';
-        wristMarkerName = 'LWRT'|| 'LWRA' || 'LWRB';
+        wristL = getVectorFromMarker(frameData, 'LWRT') 
+            || getVectorFromMarker(frameData, 'LWRA') 
+            || getVectorFromMarker(frameData, 'LWRB');
         infoArm = info_Arm_Left;
     }
     const palmMarker = getVectorFromMarker(frameData, palmMarkerName);
-    const wristMarker = getVectorFromMarker(frameData, wristMarkerName);
+    const wristMarker = side === 'Right' ? wristR : wristL;
 
     // Avoids the T-pose when there is no info for the arm/forearm 
     if (palmMarker && ArmBone && foreArmBone && !infoArm) {
@@ -372,6 +389,86 @@ function updateHandFingers(side, frameData) {
             }
         }
     });
+}*/
+function updateHandFingers(side, frameData) {
+    let handBone, foreArmBone, ArmBone;
+    let palmMarkerName, finMarkerName;
+    let infoArm;
+
+    if (side === 'Right') {
+        foreArmBone = avatarBones.RightForeArm;
+        ArmBone = avatarBones.RightArm;
+        handBone = avatarBones.RightHand;
+        palmMarkerName = 'RPLM';
+        finMarkerName = 'RFIN';
+        infoArm = info_Arm_Right;
+    } else {
+        foreArmBone = avatarBones.LeftForeArm;
+        ArmBone = avatarBones.LeftArm;
+        handBone = avatarBones.LeftHand;
+        palmMarkerName = 'LPLM';
+        finMarkerName = 'LFIN';
+        infoArm = info_Arm_Left;
+    }
+
+    const palmMarker = getVectorFromMarker(frameData, palmMarkerName);
+    const finMarker  = getVectorFromMarker(frameData, finMarkerName);
+
+    const wristMarker = side === 'Right'
+        ? (getVectorFromMarker(frameData, 'RWRT') || getVectorFromMarker(frameData, 'RWRA') || getVectorFromMarker(frameData, 'RWRB'))
+        : (getVectorFromMarker(frameData, 'LWRT') || getVectorFromMarker(frameData, 'LWRA') || getVectorFromMarker(frameData, 'LWRB'));
+
+    // Avoid T-pose when there is no info for the arm/forearm
+    // Use palm first, fallback to RFIN/LFIN
+    const poseTarget = palmMarker || finMarker;
+    if (poseTarget && ArmBone && foreArmBone && !infoArm) {
+        const foreArmWorldPos = new THREE.Vector3();
+        foreArmBone.getWorldPosition(foreArmWorldPos);
+        alignBone(foreArmBone, foreArmWorldPos, poseTarget);
+
+        const armWorldPos = new THREE.Vector3();
+        ArmBone.getWorldPosition(armWorldPos);
+        alignBone(ArmBone, armWorldPos, foreArmWorldPos);
+    }
+
+    // Force hand to emulate wrist marker position, only when no arm/forearm info
+    if (handBone && wristMarker && !infoArm) {
+        const localPosition = handBone.parent.worldToLocal(wristMarker.clone());
+        handBone.position.copy(localPosition);
+    }
+
+    // Finger kinematics
+    const markersMap = FINGER_MARKERS[side];
+    const fingersMap = side === 'Right' ? avatarBones.RightFingers : avatarBones.LeftFingers;
+
+    // Check if there is any real finger marker data in this frame
+    const hadFingerData = Object.keys(fingersMap).some(fingerName => {
+        const markerNames = markersMap[fingerName];
+        return markerNames.some(name => getVectorFromMarker(frameData, name) !== null);
+    });
+
+    if (hadFingerData) {
+        // Normal path: orient each phalange toward the next marker in the chain
+        Object.keys(fingersMap).forEach(fingerName => {
+            const bones = fingersMap[fingerName];
+            const markerNames = markersMap[fingerName];
+            for (let i = 0; i < 3; i++) {
+                const bone = bones[i];
+                const mStartName = markerNames[i];
+                const mEndName = markerNames[i + 1];
+                if (bone && mStartName && mEndName) {
+                    const vStart = getVectorFromMarker(frameData, mStartName);
+                    const vEnd   = getVectorFromMarker(frameData, mEndName);
+                    if (vStart && vEnd) alignBone(bone, vStart, vEnd);
+                }
+            }
+        });
+    } else if (finMarker && wristMarker) {
+        // Fallback: no finger markers — orient all proximal phalanges toward RFIN/LFIN
+        Object.values(fingersMap).forEach(bones => {
+            if (bones[0]) alignBone(bones[0], wristMarker, finMarker);
+        });
+    }
 }
 
 /**
